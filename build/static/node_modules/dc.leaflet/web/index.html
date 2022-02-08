@@ -1,0 +1,383 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+	<title>DC.js + Leaflet</title>
+
+	<meta itemprop="name" content="DC.js + Leaflet"/>
+	<meta itemprop="description" content="DC.js + Leaflet chart"/>
+
+	<meta charset="UTF-8">
+
+	<link type="text/css" href="css/leaflet.css" rel="stylesheet"/>
+	<link type="text/css" href="css/MarkerCluster.Default.css" rel="stylesheet"/>
+	<link type="text/css" href="css/MarkerCluster.css" rel="stylesheet"/>
+	<link type="text/css" href="css/dc.css" rel="stylesheet"/>
+	<link type="text/css" href="css/leaflet-legend.css" rel="stylesheet"/>
+
+  <style>
+    #holder {
+      width:850px;
+      margin:20px auto;
+    }
+    #holder>div {
+      padding:30px 0;
+      clear:both;
+    }
+    .map {
+      width:600px;
+      height:400px;
+    }
+    .pie {
+      margin-left:30px;
+    }
+    #octocat {
+      position: absolute;
+      right: 5px;
+      top: 5px;
+    }
+    /*map legend styling*/
+    /*--*/
+  </style>
+</head>
+<body>
+
+<div id="holder">
+  <div id="demo1">
+    <h2>Markers with clustering, popups and single selection</h2>
+    <i>Renewable energy plants in Bulgaria in 2012</i>
+    <div class="map" id='cluster-map'></div>
+    <div id='cluster-map-anchor'></div>
+    <div class="pie"></div>
+  </div>
+
+  <div id="demo2">
+    <h2>Markers with no clustering and selection by area</h2>
+    <i>Renewable energy plants in Bulgaria in 2012</i>
+    <div class="map"></div>
+    <div class="pie"></div>
+  </div>
+
+  <div id="demo3">
+    <h2>Le choropleth</h2>
+    <i>Population by age groups in Bulgaria in 2011 (excluding the capital)</i>
+    <div class="map"></div>
+    <div class="pie"></div>
+  </div>
+
+  <div id="demo4">
+    <h2>Bubble chart</h2>
+    <i>Population by age groups in Bulgaria in 2011</i>
+    <div class="map"></div>
+    <div class="pie"></div>
+  </div>
+</div>
+
+<div id="octocat">
+  <a href="http://github.com/dc-js/dc.leaflet.js">
+    <img src="GitHub-Mark-64px.png" />
+  </a>
+</div>
+
+<script type="text/javascript" src="js/d3.js"></script>
+<script type="text/javascript" src="js/crossfilter.js"></script>
+<script type="text/javascript" src="js/dc.js"></script>
+<script type="text/javascript" src="js/leaflet.js"></script>
+<script src="js/colorbrewer.js"></script>
+
+<!--Optional-->
+<script type="text/javascript" src="js/leaflet.markercluster.js"></script>
+
+<script type="text/javascript" src="js/dc.leaflet.js"></script>
+<script type="text/javascript">
+
+var clusterMap = L.map('cluster-map', {
+		center: [42.69,25.42],
+		zoom: 7
+	}); 
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(clusterMap);
+
+ var facilitiesGroup = false;
+ var returnObject = false;
+
+  /*     Markers      */
+
+  d3.tsv("demo1.tsv").then(function(data) {
+      drawMarkerSelect(data);
+      drawMarkerArea(data);
+  });
+
+  function drawMarkerSelect(data) {
+      var xf = crossfilter(data);
+      var groupname = "marker-select";
+      var facilities = xf.dimension(function(d) { return d.geo; });
+      var facilitiesGroup = facilities.group().reduceCount();
+
+      var marker = dc_leaflet.markerChart("#cluster-map-anchor",groupname)
+          .dimension(facilities)
+          .group(facilitiesGroup)
+          .map(clusterMap)
+          .showMarkerTitle(false)
+          .fitOnRender(true)
+          .fitOnRedraw(true)
+          .filterByArea(true)
+          .cluster(true);
+
+
+      var types = xf.dimension(function(d) { return d.type; });
+      var typesGroup = types.group().reduceCount();
+
+      var pie = dc.pieChart("#demo1 .pie", groupname)
+          .dimension(types)
+          .group(typesGroup)
+          .width(200)
+          .height(200)
+          .renderLabel(true)
+          .renderTitle(true)
+          .ordering(function (p) {
+              return -p.value;
+          });
+
+      dc.renderAll(groupname);
+      return {marker: marker, pie: pie};
+  }
+
+  function drawMarkerArea(data) {
+      var xf = crossfilter(data);
+      var groupname = "marker-area";
+      var facilities = xf.dimension(function(d) { return d.geo; });
+      var facilitiesGroup = facilities.group().reduce(
+          function(p, v) {
+              p.type = v.type;
+              ++p.count;
+              return p;
+          },
+          function(p, v) {
+              --p.count;
+              return p;
+          },
+          function() {
+              return {count: 0};
+          }
+      );
+
+      var marker = dc_leaflet.markerChart("#demo2 .map",groupname)
+          .dimension(facilities)
+          .group(facilitiesGroup)
+          .valueAccessor(d => d.value.count)
+          .width(600)
+          .height(400)
+          .center([42.69,25.42])
+          .zoom(7)
+          .popupMod('ctrlCmd')
+          .filterByArea(true)
+          .icon(function(d) {
+              var iconUrl;
+              switch(d.value.type) {
+              case 'solar':
+                  iconUrl = 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-yellow.png';
+                  break;
+              case 'hydro':
+                  iconUrl = 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png';
+                  break;
+              case 'wind':
+                  iconUrl = 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png';
+                  break;
+              case 'biomass':
+                  iconUrl = 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-grey.png';
+                  break;
+              case 'gas_waste':
+                  iconUrl = 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-orange.png';
+                  break;
+              case 'hydro_waste':
+                  iconUrl = 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-violet.png';
+                  break;
+              default:
+                  console.log('unk', d.value.type);
+                  return new L.Icon.Default();
+              }
+              return new L.Icon({
+                  iconUrl: iconUrl,
+                  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png'
+              });
+          });
+
+      var types = xf.dimension(function(d) { return d.type; });
+      var typesGroup = types.group().reduceCount();
+
+      var pie = dc.pieChart("#demo2 .pie",groupname)
+          .dimension(types)
+          .group(typesGroup)
+          .width(200)
+          .height(200)
+          .renderLabel(true)
+          .renderTitle(true)
+          .ordering(function (p) {
+              return -p.value;
+          });
+
+      dc.renderAll(groupname);
+      return {marker: marker, pie: pie};
+  }
+
+  Promise.all([d3.json("bulgaria.geojson"), d3.csv("demo2.csv")])
+    .then(function([demo2_geojson, demo2]) {
+        drawChoropleth(demo2,demo2_geojson);
+        returnObject = drawBubbles(demo2,demo2_geojson);
+  });
+
+  /*     Choropleth      */
+
+  function drawChoropleth(data,geojson) {
+      dataP = [];
+      data.filter(function(d) {
+          return d.code && d.code!='SOF46';
+      }).forEach(function(d) {
+          d.sum = 0;
+          for(var p in d)
+              if (p && p!="code" && p!="sum") {
+                  dataP.push({'code':d.code,'type':p,'value':+d[p]});
+                  d.sum+=+d[p];
+              }
+      });
+      delete data;
+
+      var xf = crossfilter(dataP);
+      var groupname = "Choropleth";
+      var facilities = xf.dimension(function(d) { return d.code; });
+      var facilitiesGroup = facilities.group().reduceSum(function(d) { return d.value;});
+
+      var choro = dc_leaflet.choroplethChart("#demo3 .map",groupname)
+          .dimension(facilities)
+          .group(facilitiesGroup)
+          .width(600)
+          .height(400)
+          .center([42.69,25.42])
+          .zoom(7)
+          .geojson(geojson)
+          .colors(colorbrewer.YlGnBu[7])
+          .colorDomain([
+              d3.min(facilitiesGroup.all(), dc.pluck('value')),
+              d3.max(facilitiesGroup.all(), dc.pluck('value'))
+          ])
+          .colorAccessor(function(d,i) {
+              return d.value;
+          })
+          .featureKeyAccessor(function(feature) {
+              return feature.properties.code;
+          })
+          .popupMod('ctrlCmd')
+          .renderPopup(true)
+          .popup(function(d,feature) {
+              return feature.properties.nameEn+" : "+d.value;
+          })
+          .legend(dc_leaflet.legend().position('bottomright'));
+
+
+      var types = xf.dimension(function(d) { return d.type; });
+      var typesGroup = types.group().reduceSum(function(d) { return d.value;});
+
+      var pie = dc.pieChart("#demo3 .pie",groupname)
+          .dimension(types)
+          .group(typesGroup)
+          .width(200)
+          .height(200)
+          .ordering(function (p) {
+              return +p.key.substr(6);
+          })
+          .renderLabel(false)
+          .renderTitle(true)
+          .title(function(d) {
+              var age = d.key.substr(6);
+              if (age.indexOf("p")==-1)
+                  age="Between "+(+age-4)+"-"+age;
+              else
+                  age="Over "+age.substr(0,2);
+              return age+" : "+d.value;
+          });
+
+      dc.renderAll(groupname);
+      return {choro: choro, pie: pie};
+  }
+  /*     Bubble Chart      */
+
+  function drawBubbles(data, geojson) {
+      // extract centroids from geojson shapes
+      dataP = [];
+      var pos = {}, max = 0;
+      data.forEach(function(d) {
+          var geo = geojson.features.find(f => f.properties.code === d.code);
+          var points = geo.geometry.coordinates[0];
+          if(Array.isArray(points[0][0]))
+              points = geo.geometry.coordinates.reduce(function(p, v) {
+                  return p.concat(v);
+              }, []);
+          var p = [d3.sum(points, p => +p[1])/points.length, d3.sum(points, p => +p[0])/points.length];
+          pos[d.code] = p;
+          d.sum = 0;
+          for(var p in d)
+              if (p && p!="code" && p!="sum") {
+                  dataP.push({'code':d.code,'type':p,'value':+d[p]});
+                  d.sum+=+d[p];
+              }
+          if(d.sum > max)
+              max = d.sum;
+      });
+      delete data;
+
+      var xf = crossfilter(dataP);
+      var groupname = "Bubbles";
+      var facilities = xf.dimension(function(d) { return d.code; });
+      facilitiesGroup = facilities.group().reduceSum(function(d) { return d.value;});
+
+      var choro = dc_leaflet.bubbleChart("#demo4 .map",groupname)
+          .dimension(facilities)
+          .group(facilitiesGroup)
+          .width(600)
+          .height(400)
+          .center([42.69,25.42])
+          .renderPopup(false)
+          .colors(colorbrewer.Reds[7])
+          .colorDomain([
+              d3.min(facilitiesGroup.all(), dc.pluck('value')),
+              d3.mean(facilitiesGroup.all(), dc.pluck('value'))
+          ])
+          .colorAccessor(function(d,i) {
+              return d.value;
+          })
+          .popup(d => d.key)
+          .zoom(7)
+          .locationAccessor(d => pos[d.key])
+          .r(d3.scaleLog().domain([1, max]).range([0,20]))
+          .legend(dc_leaflet.legend().position('bottomright').legendTitle("Bubble"));
+
+      var types = xf.dimension(function(d) { return d.type; });
+      var typesGroup = types.group().reduceSum(function(d) { return d.value;});
+
+      var pie = dc.pieChart("#demo4 .pie",groupname)
+          .dimension(types)
+          .group(typesGroup)
+          .width(200)
+          .height(200)
+          .ordering(function (p) {
+              return +p.key.substr(6);
+          })
+          .renderLabel(false)
+          .renderTitle(true)
+          .title(function(d) {
+              var age = d.key.substr(6);
+              if (age.indexOf("p")==-1)
+                  age="Between "+(+age-4)+"-"+age;
+              else
+                  age="Over "+age.substr(0,2);
+              return age+" : "+d.value;
+          });
+
+      dc.renderAll(groupname);
+      return {choro: choro, pie: pie};
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,300 @@
+<html>
+
+<head>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=UA-112039180-1"></script> -->
+  <!-- <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'UA-112039180-1');
+  </script> -->
+
+  <title>Dying Alone in Tokyo</title>
+
+  <!-- CSS -->
+
+  <link rel="stylesheet" href="/static/css/custom.css" />
+  <!-- Old version because new ver messes up row chart -->
+  <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/static/css/bootstrap-toggle.min.css">
+  <link rel="stylesheet" href="/static/node_modules/leaflet/dist/leaflet.css" />
+  <link rel="stylesheet" href="/static/node_modules/dc/dist/style/dc.min.css" />
+  <link rel="stylesheet"
+    href="/static/node_modules/font-awesome/css/font-awesome.min.css" />
+  <!-- 
+  <link rel="stylesheet" href="/static/lib/bootstrap-select/1.12.4/css/bootstrap-select.min.css">
+  <link rel="stylesheet" href="/static/css/leaflet.zoomhome.css" />
+  -->
+
+  <!-- JavaScript -->
+  <script src="/static/node_modules/leaflet/dist/leaflet.js"></script>
+  <script src="/static/node_modules/d3/dist/d3.min.js"></script>
+  <script src="/static/node_modules/crossfilter/crossfilter.min.js"></script>
+  <script src="/static/node_modules/dc/dist/dc.min.js"></script>
+  <script src="/static/node_modules/leaflet-pip/leaflet-pip.js"></script>
+  <script src="/static/node_modules/underscore/underscore-min.js"></script>
+  <script src="/static/node_modules/dc.leaflet/dc.leaflet.js"></script>
+  
+
+  <!-- <script src="/static/js/leaflet.zoomhome.min.js"></script> -->
+  <script src="/static/js/jquery.min.js"></script>
+  <script src="/static/js/bootstrap.min.js"></script>
+  <script src="/static/js/bootstrap-toggle.min.js"></script>
+  <script type="text/javascript" src="/static/js/dc-restore-transition-duration.js"></script>
+
+  <!-- 
+  <script src="/static/lib/bootstrap-select/1.12.4/js/bootstrap-select.min.js"></script> -->
+</head>
+
+<body class="application">
+
+  <!-- Navbar  -->
+  <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <a class="navbar-brand">
+          <!-- <i class="fa fa-car" aria-hidden="true"></i> -->
+          &nbsp;&nbsp;Dying alone in Tokyo, Japan
+        </a>
+      </div>
+      <ul class="nav navbar-nav navbar-left">
+        <li> <a href="https://passaglia.github.io"> By Sam Passaglia, University of Tokyo Kavli IPMU</a> </li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+          <a href="javascript:dc.filterAll();dc.redrawAll();ward_lock = false;info.update();">[reset
+            all]</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="container-fluid">
+
+    <div class="row">
+
+      <div class="col-xs-12 col-md-3">
+        <!-- Intro panel -->
+        <div class='panel' style='padding: 5px'>
+          <p style="font-size: 16px"><b>Welcome!</b></p>
+          <p> Every year, roughly a hundred thousand people die in Tokyo. Thousands of those people die at home, alone. Begin exploring this data.
+          </p>
+
+          <p>
+            <b>Applying filters:</b>
+            The map and charts below are interactive, allowing the data to be filtered and navigated in different ways. 
+          </p>
+        </div>
+      </div>
+
+      <div class="col-xs-12 col-md-5">
+        <!-- The Map -->
+        <div class="chart-wrapper">
+          <div class="chart-title">
+            Ward Map
+            <a onclick="toggle(this, '#map-help')">[show help]</a>
+          </div>
+          <div class="chart-notes" id="map-help" style="display: none">
+            Filter by ward
+          </div>
+          <div class="chart-stage">
+
+              <div id="map" style="width: 100%; height: 415px;">
+
+            </div>
+            <div id='map-anchor'></div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="col-xs-12 col-md-4">
+        <!-- The Ward chart -->
+        <div class="chart-wrapper">
+          <div class="chart-title">
+            Deaths by ward 
+            &nbsp;&nbsp;
+            <input id="norm-toggle" type="checkbox" data-toggle="toggle"
+            width="100"
+            data-on="Normalized"
+            data-off="Absolute">
+            <script>
+              // This shoots off an event that is that captured in main.js
+              $(function() {
+                $('#norm-toggle').change(function() {
+                  d3.select("#norm-toggle").on("change")();
+                })
+              })
+            </script>
+            <a onclick="toggle(this, '#ward-help')">[show help]</a>
+          </div>
+
+          <div class="chart-notes" id="ward-help" style="display: none">
+            Filter by ward
+          </div>
+
+          <div class="chart-stage">
+            <div id="ward-chart"></div>
+          </div>
+          
+        </div>
+      </div>
+
+    </div>
+
+    <div class="row">
+
+      <div class="col-xs-12 col-md-6">
+        <!-- The Age chart-->
+        <div class="chart-wrapper">
+          <div class="chart-title">
+            Age at death
+            <a onclick="toggle(this, '#age-help')">[show help]</a>
+            <span id="age-chart-reset"
+              data-reset-script="javascript:ageChart.filterAll();dc.redrawAll();">
+            </span>
+          </div>
+
+          <div class="chart-notes" id="age-help" style="display: none">
+            Filter by age
+          </div>
+
+          <div class="chart-stage">
+            <div id="age-chart" ></div>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="col-xs-12 col-md-6">
+        <!-- The Time chart-->
+        <div class="chart-wrapper">
+          <div class="chart-title">
+            Time until discovery
+            <a onclick="toggle(this, '#time-help')">[show help]</a>
+            <span id="time-chart-reset"
+              data-reset-script="javascript:timeChart.filterAll();dc.redrawAll();">
+            </span>
+          </div>
+
+          <div class="chart-notes" id="time-help" style="display: none">
+            Filter by time
+          </div>
+
+          <div class="chart-stage">
+            <div id="time-chart" ></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xs-12 col-md-3">
+        <!-- The Gender chart-->
+        <div class="chart-wrapper">
+          <div class="chart-title">
+            Deaths by gender
+            <a onclick="toggle(this, '#gender-help')">[show help]</a>
+            <span id="gender-chart-reset"
+              data-reset-script="javascript:genderChart.filterAll();dc.redrawAll();">
+            </span>
+          </div>
+
+          <div class="chart-notes" id="gender-help" style="display: none">
+            Filter by gender by clicking on the chart. The city reports information for each gender.
+          </div>
+
+          <div class="chart-stage">
+            <div id="gender-chart" style="width: 100%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xs-12 col-md-3">
+        <!-- The Household chart-->
+        <div class="chart-wrapper">
+          <div class="chart-title">
+            Deaths by household status
+            <a onclick="toggle(this, '#household-help')">[show help]</a>
+            <span id="household-chart-reset"
+              data-reset-script="javascript:householdChart.filterAll();dc.redrawAll();">
+            </span>
+          </div>
+
+          <div class="chart-notes" id="household-help" style="display: none">
+            Filter by household status
+          </div>
+
+          <div class="chart-stage">
+            <div id="household-chart" style="width: 100%;"></div>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="col-xs-12 col-md-6">
+        <!-- The Household chart-->
+        <div class="chart-wrapper">
+          <div class="chart-title">
+            Deaths by year
+            <a onclick="toggle(this, '#year-help')">[show help]</a>
+            <span id="year-chart-reset"
+              data-reset-script="javascript:yearChart.filterAll();dc.redrawAll();">
+            </span>
+          </div>
+
+          <div class="chart-notes" id="year-help" style="display: none">
+            Filter by year
+          </div>
+
+          <div class="chart-stage">
+            <div id="year-chart" style="width: 100%;"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer id="footer">
+
+      <div class="social icons">
+        <a href="https://github.com/passaglia" class="icon circle fa-github"><span class="label">Github</span></a>
+        <a href="https://twitter.com/andpersam" class="icon circle fa-twitter"><span class="label">Twitter</span></a>
+        <a href="https://www.linkedin.com/in/sam-passaglia" class="icon circle fa-linkedin"><span
+            class="label">Linkedin</span></a>
+      </div>
+      <div class="copyright">
+        <div class="menu">
+          <p>&copy; Sam Passaglia 2022</p>
+          <p>Data from the <a href="https://www.fukushihoken.metro.tokyo.lg.jp/kansatsu/kodokushitoukei/index.html "
+              target="_blank">Tokyo Coroner's Office</a> via the <a href="https://portal.data.metro.tokyo.lg.jp/" target="_blank">Tokyo Open Data
+                Catalog</a>.
+          </p>
+        </div>
+      </div>
+    </footer>
+  </div>
+  </div>
+
+  <!-- the script for the toggle -->
+  <script type="text/javascript">
+    function toggle(t, id) {
+      if (t.innerHTML == "[hide help]") {
+        t.innerHTML = "[show help]";
+        $(id).hide();
+      } else {
+        t.innerHTML = "[hide help]";
+        $(id).show();
+      }
+    }
+  </script>
+
+  <!-- the main charting javascript -->
+  <script type="text/javascript" src="/static/js/main.js"></script>
+
+
+</body>
+
+</html>

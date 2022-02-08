@@ -102,3 +102,7 @@ https://stackoverflow.com/questions/22184013/dc-js-multiple-graphs-in-a-single-d
 -- clean up the code and add comments
 
 -- lock map view?
+
+-- Test deploy
+https://pythonhosted.org/Frozen-Flask/w
+https://stevenloria.com/hosting-static-flask-sites-on-github-pages/
