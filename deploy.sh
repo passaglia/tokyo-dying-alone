@@ -2,7 +2,7 @@
 directory=_site
 branch=gh-pages
 build_command() {
-  python3 freeze
+  python3 freeze.py
 }
 
 echo -e "\033[0;32mDeleting old content...\033[0m"
