@@ -5,6 +5,17 @@ build_command() {
   python3 freeze.py
 }
 
+
+echo -e "\033[0;32mDeleting existing $branch...\033[0m"
+git push origin --delete $branch
+git branch -D $branch
+
+echo -e "\033[0;32mSetting up new $branch branch\033[0m"
+git checkout --orphan $branch
+git reset --hard
+git commit --allow-empty -m "Init"
+git checkout main
+
 echo -e "\033[0;32mDeleting old content...\033[0m"
 rm -rf $directory
 
