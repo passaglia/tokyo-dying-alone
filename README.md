@@ -103,6 +103,10 @@ https://stackoverflow.com/questions/22184013/dc-js-multiple-graphs-in-a-single-d
 
 -- lock map view?
 
--- Test deploy
-https://pythonhosted.org/Frozen-Flask/w
+-- Test deploy: Right now we're on passaglia.pythonanywhere.com but probably best to do github pages for which we have to staticify our app.
+https://pythonhosted.org/Frozen-Flask/
 https://stevenloria.com/hosting-static-flask-sites-on-github-pages/
+https://docs.github.com/ja/pages/getting-started-with-github-pages/about-github-pages
+
+right now if I go into build and run npx browser-sync start --server it works.
+

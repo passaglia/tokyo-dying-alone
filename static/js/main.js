@@ -26,9 +26,6 @@ function makeDashboard(data) {
     });
   }
 
-  // Total deaths in each ward for normalization purposes
-  //total_deaths_this_year = total[year];
-
   // Create a Crossfilter instance from the dataset
   var ndx = crossfilter(alone);
 
@@ -478,28 +475,19 @@ function makeDashboard(data) {
   new ResizeObserver(callback(householdChart)).observe(d3.select('#household-chart').node());
   new ResizeObserver(callback(genderChart)).observe(d3.select('#gender-chart').node());
 
-    // Helper function to add x-axis labels
-    // function addXAxis(chartToUpdate, displayText) {
-    //   chartToUpdate.svg()
-    //             .append("text")
-    //             .attr("class", "x-axis-label")
-    //             .attr("text-anchor", "middle")
-    //             .attr("x", chartToUpdate.width()/2)
-    //             .attr("y", chartToUpdate.height()-7)
-    //             .text(displayText);
-    // }
+  // Helper function to add x-axis labels
+  function addXAxis(chartToUpdate, displayText) {
+    chartToUpdate.svg()
+              .append("text")
+              .attr("class", "x-axis-label")
+              .attr("text-anchor", "middle")
+              .attr("x", chartToUpdate.width()/2)
+              .attr("y", chartToUpdate.height()-7)
+              .text(displayText);
+  }
 
   // Add x axis labels
-  // addXAxis(ageChart, "Age");
-  // addXAxis(timeChart, "Days until discovery");
-  // addXAxis(yearChart, "Year");
-  // addXAxis(wardChart, "Deaths");
-
-  // const callback_xlabel = (chart_label,chart) => entries => {
-  //   d3.select(chart_label + ' svg text.x-axis-label').node().attr("x", chart.width()/2);
-  // };
-  
-  // new ResizeObserver(callback_xlabel("#age-chart",ageChart)).observe(d3.select('#age-chart').node());
+  addXAxis(wardChart, "Deaths");
 
 
 }
