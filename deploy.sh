@@ -1,5 +1,5 @@
 #!/bin/bash
-directory=_site
+directory=build
 branch=gh-pages
 build_command() {
   python3 freeze.py
