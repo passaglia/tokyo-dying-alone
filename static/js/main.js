@@ -29,23 +29,19 @@ function makeDashboard(data) {
 
   // Define x-axis dimensions of plots
   var yearDim = ndx.dimension(function(d) {return +d["year"]+2000;})
-  // bug here with the csv the csv has turned 01 to 1
   var wardDim = ndx.dimension(function (d) { return shortToName[d["ward"]]; })
   var genderDim = ndx.dimension(function (d) { if (d["gender"] == 'm'){return "Men";} else if (d["gender"]=='w'){return "Women";}})
   var householdDim = ndx.dimension(function (d) { if (d["household"] == 'm'){return "with Others";} else if (d["household"]=='s'){return "Living alone";}})
   var ageDim = ndx.dimension(function (d) { return d["age"]; })
   var timeDim = ndx.dimension(function (d) { return d["time"]; })
 
-  //var deathsDim = ndx.dimension(function(d) {return d["deaths"];})
-  //var allDim = ndx.dimension(function(d) {return d;});
-
   // Define data groups. These are what will be plotted in each chart.
   var deathsByAge = ageDim.group().reduceCount();
-  var deathsByTime = timeDim.group().reduceCount();
   var deathsByGender = genderDim.group().reduceCount();
   var deathsByHousehold = householdDim.group().reduceCount();
 
-  //  Normalized by total deaths in ward by year
+  // For the deathsByWard we want to enable switching between normalized and unnormalized
+  // so we use a custom reduce
   var deathsByWard = wardDim.group().reduce(
     function (p, v) {
       ++p.count;
@@ -60,72 +56,34 @@ function makeDashboard(data) {
     function () { return {count:0,normalized_count:0}; }
   );
 
-  //  Normalized by total deaths in ward by year
-    var deathsByYear = yearDim.group().reduce(
-      function (p, v) {
-        ++p.count;
-        p.normalized_count += 1/total_per_year[+v.year+2000]
-        return p;
-      },
-      function (p, v) {
-        --p.count;
-        p.normalized_count -= 1/total_per_year[+v.year+2000]
-        return p;
-      },
-      function () { return {count:0,normalized_count:0}; }
-    );
+  // Same for deathsByYear
+  var deathsByYear = yearDim.group().reduce(
+    function (p, v) {
+      ++p.count;
+      p.normalized_count += 1/total_per_year[+v.year+2000]
+      return p;
+    },
+    function (p, v) {
+      --p.count;
+      p.normalized_count -= 1/total_per_year[+v.year+2000]
+      return p;
+    },
+    function () { return {count:0,normalized_count:0}; }
+  );
   
-  //var all = ndx.groupAll();
-
-  // Deaths by Age Chart
-  ageChart = dc.barChart("#age-chart");
-  ageChart
-    .xAxisLabel("Age")
-    //.yAxisLabel("Deaths")
-    .dimension(ageDim)
-    .group(deathsByAge)
-    .xUnits(function(){return 16})
-    .centerBar(true)
-    .x(d3.scaleLinear().domain([9, 89]))
-    //.x(d3.scaleBand())
-    .elasticY(true)
-    .width(null)
-    .height(null)
-    .brushOn(true)
-    .margins({ top: 10, right: 10, bottom: 50, left: 45 })
-    .on('filtered', function (chart) {
-      toggleReset(chart, 'age-chart-reset');
-    })
-    .yAxis().ticks(4);
-
-  ageChart.xAxis()
-    .tickValues(d3.range(12,92,5))
-    .tickFormat(function(d) { 
-      if (d == 12) {return '<15'};
-      if (d == 87) {return '>84'}; 
-
-    return d; });
-
-  // Deaths by Time Chart
-  timeChart = dc.barChart("#time-chart");
-  timeChart
-    .xAxisLabel("Days until discovered")
-    .yAxisLabel("Deaths")
-    .dimension(timeDim)
-    .group(deathsByTime)
-    .xUnits(dc.units.ordinal)
-    .x(d3.scaleBand())
-    .ordering(function(d) {x = d.key.split('-')[0].split('>'); return +x[x.length-1];})
-    .elasticY(true)
-    .width(null)
-    .height(null)
-    .margins({ top: 10, right: 10, bottom: 50, left: 65 })
-    .on('filtered', function (chart) {
-      toggleReset(chart, 'time-chart-reset');
-    })
-    .yAxis().ticks(4);
+  // For deaths by we use a hack to allow ordinal plots to be brushed
+  var deathsByTime = timeDim.group().reduceCount();
+  keysToIntegers = {}
+  integersToKeys = {}
+  keys = deathsByTime.top(Infinity).map(d => d.key)
+  integers = d3.range(keys.length)
+  _.each(integers, function(d){ keysToIntegers[keys[d]] = d; integersToKeys[d] = keys[d]; });
+  var ordinalTimeDim = ndx.dimension(function (d) { return keysToIntegers[d["time"]]; })
+  var deathsByOrdinalTime = ordinalTimeDim.group().reduceCount();
 
 
+  // Now we build each chart
+  
   // Deaths by Gender Chart
   genderChart = dc.barChart("#gender-chart");
   genderChart
@@ -141,10 +99,10 @@ function makeDashboard(data) {
     .on('filtered', function (chart) {
       toggleReset(chart, 'gender-chart-reset');
     })
-    .addFilterHandler(function(filters, filter) {return [filter];}) // single filter only
+    .addFilterHandler(function(filters, filter) {return [filter];}) // allow single filter only
     .yAxis().ticks(4);
     
-  // Deaths by Household Status Chart
+  // Deaths by Household Chart
   householdChart = dc.barChart("#household-chart");
   householdChart
     .yAxisLabel("Deaths")
@@ -161,6 +119,72 @@ function makeDashboard(data) {
     })
     .addFilterHandler(function(filters, filter) {return [filter];}) // allow single filter only
     .yAxis().ticks(4);
+
+  // Deaths by Time Chart
+  timeChart = dc.barChart("#time-chart");
+  timeChart
+    .xAxisLabel("Days until discovered")
+    .yAxisLabel("Deaths")
+    .dimension(ordinalTimeDim)
+    .group(deathsByOrdinalTime)
+    .x(d3.scaleLinear().domain([-.5,8.5]))
+    .xUnits(dc.units.integers)
+    .centerBar(true)
+    //.ordering(function(d) {x = d.key.split('-')[0].split('>'); return +x[x.length-1];})
+    .elasticY(true)
+    .width(null)
+    .height(null)
+    .margins({ top: 10, right: 10, bottom: 50, left: 65 })
+    .on('filtered', function (chart) {
+      toggleReset(chart, 'time-chart-reset');
+      var filters = chart.filters();
+      if (filters.length) {
+        $("#age-chart").hide();
+      }
+      else{
+        $("#age-chart").show();
+      }
+    })
+    .yAxis().ticks(4);
+  
+  timeChart.xAxis()
+    //.tickValues(d3.range(mappings.length()))
+    .tickFormat(function(d) { return integersToKeys[d]; });
+
+  // Deaths by Age Chart
+  ageChart = dc.barChart("#age-chart");
+  ageChart
+    .xAxisLabel("Age")
+    .dimension(ageDim)
+    .group(deathsByAge)
+    .xUnits(function(){return 16})
+    .centerBar(true)
+    .x(d3.scaleLinear().domain([9, 89]))
+    .elasticY(true)
+    .width(null)
+    .height(null)
+    .brushOn(true)
+    .margins({ top: 10, right: 10, bottom: 50, left: 45 })
+    .on('filtered', function (chart) {
+      toggleReset(chart, 'age-chart-reset');
+      var filters = chart.filters();
+      if (filters.length) {
+        $("#time-chart").hide();
+      }
+      else{
+        $("#time-chart").show();
+      }
+    })
+    .yAxis().ticks(4);
+
+  ageChart.xAxis()
+    .tickValues(d3.range(12,92,5))
+    .tickFormat(function(d) { 
+      if (d == 12) {return '<15'};
+      if (d == 87) {return '>84'}; 
+
+    return d; });
+
 
   // state variable for normalization 
   var normalize = false;

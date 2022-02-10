@@ -15,7 +15,6 @@ def compress(df):
     df['year'] = df['year']-2000
     return df
 
-
 def generate_simulated_data(age_df, time_df):
 
     assert (sum(time_df.sum(axis=0)[1:]) == sum(age_df.sum(axis=0)[1:]))
@@ -57,9 +56,6 @@ def generate_simulated_data(age_df, time_df):
                             break
 
     df =  pd.DataFrame(arr, columns=["age", "gender", "household", "time"])
-
-    # df['gender']=df['gender'].replace('women', 'w').replace('men','m')
-    # df['household']=df['household'].replace('single', 's').replace('multi','m')
 
     return  df
 
@@ -299,16 +295,3 @@ if __name__ == '__main__':
     df = pd.read_csv('./rawdata/shibou.csv', encoding="UTF-8")
     cleaned_total = clean_total_deaths(df)
     cleaned_total.to_json('data/total/shibou.json')
-
-
-# import os
-# import numpy as np
-# def rename_files(folder, prefactor):
-
-#     list_of_files = os.listdir(folder)
-#     list_to_sort_on = [int(x.split("-")[3][-1] + '0' + x.split("-")[5] +x.split("-")[-1].split('.')[0]) for x in list_of_files]
-#     sorting_inds = np.argsort(list_to_sort_on)
-#     list_of_files_sorted = [list_of_files[ind] for ind in sorting_inds]
-#     for i in range(len(list_of_files_sorted)):
-#         print(i)
-#         os.rename(list_of_files_sorted[i], prefactor+str(i)+'.csv')

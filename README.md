@@ -74,6 +74,13 @@ https://opendata.dc.gov/pages/stories
 
 https://github.com/DCgov
 
+## Deployment
+Deploy: We are now hosted on github pages using Frozen Flask. passaglia.jp/tokyo-dying-alone
+
+To test the build locally go into /build and run `npx browser-sync start --server'.
+
+
+
 ## To do
 
 -- Fix the normalize somehow
@@ -88,10 +95,4 @@ https://stackoverflow.com/questions/22184013/dc-js-multiple-graphs-in-a-single-d
 -- move my choropleth function to a standalone file / fork the git
 
 -- clean up the code and add comments
-
--- lock map view?
-
--- Deploy: We are now hosted on github pages using Frozen Flask. passaglia.jp/tokyo-dying-alone
-
-To test the build locally go into /build and run `npx browser-sync start --server'.
 
