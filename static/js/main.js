@@ -115,7 +115,7 @@ function makeDashboard(data) {
     .group(deathsByTime)
     .xUnits(dc.units.ordinal)
     .x(d3.scaleBand())
-    .ordering(function(d) {return +d.key.split('-')[0].split('>').at(-1);})
+    .ordering(function(d) {x = d.key.split('-')[0].split('>'); return +x[x.length-1];})
     .elasticY(true)
     .width(null)
     .height(null)
