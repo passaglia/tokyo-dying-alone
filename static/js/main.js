@@ -94,7 +94,7 @@ function makeDashboard(data) {
     .x(d3.scaleBand())
     .elasticY(true)
     .width(null)
-    .height(150)
+    .height(170)
     .margins({ top: 30, right: 30, bottom: 30, left: 65 })
     .on('filtered', function (chart) {
       toggleReset(chart, 'gender-chart-reset');
@@ -112,7 +112,7 @@ function makeDashboard(data) {
     .x(d3.scaleBand())
     .elasticY(true)
     .width(null)
-    .height(150)
+    .height(170)
     .margins({ top: 30, right: 30, bottom: 30, left: 65 })
     .on('filtered', function (chart) {
       toggleReset(chart, 'household-chart-reset');
