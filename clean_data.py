@@ -275,6 +275,16 @@ if __name__ == '__main__':
         
     #combine all the ward data into a 3D dataframe    
     all_wards_all_years = pd.concat(dataframes, axis=0, ignore_index=True)
+    
+    def age_renamer(d):
+        if d == '0-14':
+            return 10+2
+        if d == '>84':
+            return 85+2
+        return int(d.split('-')[0])+2
+
+    all_wards_all_years['age'] = all_wards_all_years['age'].map(age_renamer)
+
     all_wards_all_years.to_json('data/alone/deaths_alone.json.gz',compression='gzip')
 
     # # read the total deaths data
