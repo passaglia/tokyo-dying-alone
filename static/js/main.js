@@ -1,6 +1,6 @@
 Promise.all(
   [d3.json("data/wards"),
-  d3.json("data/alone"),
+  d3.csv("data/alone"),
   d3.json("data/total"),
   ]).then(makeDashboard);
 
@@ -29,6 +29,7 @@ function makeDashboard(data) {
 
   // Define x-axis dimensions of plots
   var yearDim = ndx.dimension(function(d) {return +d["year"];})
+  // bug here with the csv the csv has turned 01 to 1
   var wardDim = ndx.dimension(function (d) { return shortToName[d["ward"]]; })
   var genderDim = ndx.dimension(function (d) { return d["gender"]; })
   var householdDim = ndx.dimension(function (d) { return d["household"]; })
