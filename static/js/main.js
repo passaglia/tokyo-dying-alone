@@ -140,9 +140,11 @@ function makeDashboard(data) {
       var filters = chart.filters();
       if (filters.length) {
         $("#age-chart").hide();
+        $("#age-chart-hider").show();
       }
       else{
         $("#age-chart").show();
+        $("#age-chart-hider").hide();
       }
     })
     .yAxis().ticks(4);
@@ -170,9 +172,11 @@ function makeDashboard(data) {
       var filters = chart.filters();
       if (filters.length) {
         $("#time-chart").hide();
+        $("#time-chart-hider").show();
       }
       else{
         $("#time-chart").show();
+        $("#time-chart-hider").hide();
       }
     })
     .yAxis().ticks(4);
