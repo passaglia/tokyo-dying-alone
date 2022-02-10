@@ -11,10 +11,8 @@ function makeDashboard(data) {
 
   // Generate dictionaries which match ward digits to names using the wards geojson
   shortToName = {};
-  nameToShort = {};
   _.each(wards.features, function (d) {
     shortToName[d.properties.short_code] = d.properties.ward_en;
-    nameToShort[d.properties.ward_en] = d.properties.short_code;
   });
 
   // Get total deaths per year
@@ -85,16 +83,27 @@ function makeDashboard(data) {
     //.yAxisLabel("Deaths")
     .dimension(ageDim)
     .group(deathsByAge)
-    .xUnits(dc.units.ordinal)
-    .x(d3.scaleBand())
+    .xUnits(function(){return 16})
+    .centerBar(true)
+    .x(d3.scaleLinear().domain([9, 89]))
+    //.x(d3.scaleBand())
     .elasticY(true)
     .width(null)
     .height(null)
+    .brushOn(true)
     .margins({ top: 10, right: 10, bottom: 50, left: 45 })
     .on('filtered', function (chart) {
       toggleReset(chart, 'age-chart-reset');
     })
     .yAxis().ticks(4);
+
+  ageChart.xAxis()
+    .tickValues(d3.range(12,92,5))
+    .tickFormat(function(d) { 
+      if (d == 12) {return '<15'};
+      if (d == 87) {return '>84'}; 
+
+    return d; });
 
   // Deaths by Time Chart
   timeChart = dc.barChart("#time-chart");
@@ -131,11 +140,9 @@ function makeDashboard(data) {
     .on('filtered', function (chart) {
       toggleReset(chart, 'gender-chart-reset');
     })
+    .addFilterHandler(function(filters, filter) {return [filter];}) // single filter only
     .yAxis().ticks(4);
-  // TODO: Only allow filter one gender at a time
-  // var ocGender = genderChart.onClick;
-  // genderChart.onClick = function(d) { genderChart.filter(null); ocGender.call(genderChart, d); };
-
+    
   // Deaths by Household Status Chart
   householdChart = dc.barChart("#household-chart");
   householdChart
@@ -151,6 +158,7 @@ function makeDashboard(data) {
     .on('filtered', function (chart) {
       toggleReset(chart, 'household-chart-reset');
     })
+    .addFilterHandler(function(filters, filter) {return [filter];}) // allow single filter only
     .yAxis().ticks(4);
 
   // state variable for normalization 
@@ -176,7 +184,6 @@ function makeDashboard(data) {
     })
     .ordering(function (kv) {
       if (normalize) {
-        // return -kv.value / total_deaths_this_year[nameToShort[kv.key]];
         return -kv.value.normalized_count;
       }
       else {
@@ -189,11 +196,8 @@ function makeDashboard(data) {
   yearChart = dc.barChart("#year-chart");
   yearChart
     .xAxisLabel("Year")
-    //.yAxisLabel("Deaths")
     .dimension(yearDim)
     .group(deathsByYear)
-    //.xUnits(dc.units.ordinal)
-    //.x(d3.scaleBand())
     .x(d3.scaleLinear().domain([2003, 2019]))
     .elasticY(true)
     .width(null)
@@ -201,7 +205,6 @@ function makeDashboard(data) {
     .brushOn(true)
     .valueAccessor(function (kv) {
       if (normalize) {
-        //return kv.value / total_deaths_this_year[nameToShort[kv.key]];
         return kv.value.normalized_count;
       }
       else {
