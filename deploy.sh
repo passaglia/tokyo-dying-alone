@@ -1,5 +1,12 @@
 python3 freeze.py 
 
-git push origin :gh-pages
+cd build
 
-git subtree push --prefix build origin gh-pages
+git add *
+
+git commit -m 'deploy'
+
+git push
+
+cd ..
+

@@ -3,18 +3,6 @@
 ## Install Guide
 First clone the git repository
 
-Then go into the static folder and install all the javascript dependencies and packages with
-
-```
-npm init
-```
-
-To install a new package, go into /static/ and run
-
-```
-npm install --save packagename
-```
-
 ## Run Guide
 We will use flask which can be installed through pip3
 
@@ -103,10 +91,7 @@ https://stackoverflow.com/questions/22184013/dc-js-multiple-graphs-in-a-single-d
 
 -- lock map view?
 
--- Test deploy: Right now we're on passaglia.pythonanywhere.com but probably best to do github pages for which we have to staticify our app.
-https://pythonhosted.org/Frozen-Flask/
-https://stevenloria.com/hosting-static-flask-sites-on-github-pages/
-https://docs.github.com/ja/pages/getting-started-with-github-pages/about-github-pages
+-- Deploy: We are now hosted on github pages using Frozen Flask. passaglia.jp/tokyo-dying-alone
 
-right now if I go into build and run npx browser-sync start --server it works.
+To test the build locally go into /build and run `npx browser-sync start --server'.
 

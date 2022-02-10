@@ -35,6 +35,7 @@ def get_ward_data():
     filename = os.path.join(
         curr_dir, 'data/wards',
         'wards.geojson')
+        
     return json.load(open(filename))
 
 
@@ -47,8 +48,6 @@ def get_total_death_data():
         curr_dir, 'data/total',
         'shibou.json')
     
-    # df = pd.read_json(filename, dtype=False)
-
     # return it 
     return json.load(open(filename))
 

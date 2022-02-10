@@ -1,6 +1,6 @@
 Promise.all(
-  [d3.json("/data/wards"),
-  d3.json("/data/alone"),
+  [d3.json("data/wards"),
+  d3.json("data/alone"),
   d3.json("data/total"),
   ]).then(makeDashboard);
 
@@ -41,7 +41,6 @@ function makeDashboard(data) {
   //var allDim = ndx.dimension(function(d) {return d;});
 
   // Define data groups. These are what will be plotted in each chart.
-  // var deathsByYear = yearDim.group().reduceCount();
   var deathsByAge = ageDim.group().reduceCount();
   var deathsByTime = timeDim.group().reduceCount();
   var deathsByGender = genderDim.group().reduceCount();
@@ -83,7 +82,7 @@ function makeDashboard(data) {
   ageChart = dc.barChart("#age-chart");
   ageChart
     .xAxisLabel("Age")
-    .yAxisLabel("Deaths")
+    //.yAxisLabel("Deaths")
     .dimension(ageDim)
     .group(deathsByAge)
     .xUnits(dc.units.ordinal)
@@ -91,7 +90,7 @@ function makeDashboard(data) {
     .elasticY(true)
     .width(null)
     .height(null)
-    .margins({ top: 10, right: 10, bottom: 50, left: 65 })
+    .margins({ top: 10, right: 10, bottom: 50, left: 45 })
     .on('filtered', function (chart) {
       toggleReset(chart, 'age-chart-reset');
     })
@@ -127,7 +126,7 @@ function makeDashboard(data) {
     .x(d3.scaleBand())
     .elasticY(true)
     .width(null)
-    .height(null)
+    .height(150)
     .margins({ top: 30, right: 30, bottom: 30, left: 65 })
     .on('filtered', function (chart) {
       toggleReset(chart, 'gender-chart-reset');
@@ -147,7 +146,7 @@ function makeDashboard(data) {
     .x(d3.scaleBand())
     .elasticY(true)
     .width(null)
-    .height(null)
+    .height(150)
     .margins({ top: 30, right: 30, bottom: 30, left: 65 })
     .on('filtered', function (chart) {
       toggleReset(chart, 'household-chart-reset');
@@ -163,8 +162,9 @@ function makeDashboard(data) {
     .dimension(wardDim)
     .group(deathsByWard)
     .width(null)
-    .height(400)
+    .height(375)
     .elasticX(true)
+    .gap(0)
     .margins({ top: 10, right: 10, bottom: 40, left: 10 })
     .valueAccessor(function (kv) {
       if (normalize) {
@@ -189,11 +189,12 @@ function makeDashboard(data) {
   yearChart = dc.barChart("#year-chart");
   yearChart
     .xAxisLabel("Year")
-    .yAxisLabel("Deaths")
+    //.yAxisLabel("Deaths")
     .dimension(yearDim)
     .group(deathsByYear)
-    .xUnits(dc.units.ordinal)
-    .x(d3.scaleBand())
+    //.xUnits(dc.units.ordinal)
+    //.x(d3.scaleBand())
+    .x(d3.scaleLinear().domain([2003, 2019]))
     .elasticY(true)
     .width(null)
     .height(null)
@@ -207,7 +208,7 @@ function makeDashboard(data) {
         return kv.value.count;
       }
     })
-    .margins({ top: 30, right: 30, bottom: 45, left: 60 })
+    .margins({ top: 10, right: 10, bottom: 50, left: 45 })
     .on('filtered', function (chart) {
       toggleReset(chart, 'year-chart-reset');
     })
@@ -224,7 +225,16 @@ function makeDashboard(data) {
   const mapLat_ini = 35.665; // Tokyo
   const mapLong_ini = 139.75; // Tokyo
   const mapZoom_ini = 10.5;
-  var map = L.map('map', { zoomSnap: .25, zoomDelta: .5 }).setView([mapLat_ini, mapLong_ini], mapZoom_ini);
+  const box_half_side = .2;
+  bounds = L.latLngBounds(L.latLng(mapLat_ini-box_half_side, mapLong_ini-box_half_side),
+  L.latLng(mapLat_ini+box_half_side, mapLong_ini+box_half_side));
+  var map = L.map('map', { zoomSnap: .25, zoomDelta: .5, maxBounds: bounds}).setView([mapLat_ini, mapLong_ini], mapZoom_ini);
+  // map.dragging.disable();
+  // map.touchZoom.disable();
+  // map.doubleClickZoom.disable();
+  // map.scrollWheelZoom.disable();
+  // map.boxZoom.disable();
+  // map.keyboard.disable();
 
   // Load the base layer
   L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
@@ -472,8 +482,8 @@ function makeDashboard(data) {
   new ResizeObserver(callback(yearChart)).observe(d3.select('#year-chart').node());
   new ResizeObserver(callback(timeChart)).observe(d3.select('#time-chart').node());
   new ResizeObserver(callback(wardChart)).observe(d3.select('#ward-chart').node());
-  new ResizeObserver(callback(householdChart)).observe(d3.select('#household-chart').node());
-  new ResizeObserver(callback(genderChart)).observe(d3.select('#gender-chart').node());
+  // new ResizeObserver(callback(householdChart)).observe(d3.select('#household-chart').node());
+  // new ResizeObserver(callback(genderChart)).observe(d3.select('#gender-chart').node());
 
   // Helper function to add x-axis labels
   function addXAxis(chartToUpdate, displayText) {

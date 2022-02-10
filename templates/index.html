@@ -70,21 +70,71 @@
 
     <div class="row">
 
-      <div class="col-xs-12 col-md-3">
+      <div class="col-xs-12 col-md-4">
+
         <!-- Intro panel -->
-        <div class='panel' style='padding: 5px'>
+        <div class='panel' style='padding: 5px; margin-bottom:10px'>
           <p style="font-size: 16px"><b>Welcome!</b></p>
-          <p> Every year, roughly a hundred thousand people die in Tokyo. Thousands of those people die at home, alone. Begin exploring this data.
+          <p> Every year, the city of Tokyo gathers information about the thousands of its residents who die at home, alone.
+          </p>
+
+          <b>Begin exploring this data.</b>
+          <p>
+            The charts on this page are interactive and responsive, allowing the data to be filtered in different ways. Click the `show help' button above each chart for more information.
           </p>
 
           <p>
-            <b>Applying filters:</b>
-            The map and charts below are interactive, allowing the data to be filtered and navigated in different ways. 
+            For an detailed explanation of how this page was made, see the upcoming blog post.
           </p>
+        </div>
+
+
+      <div class="col-xs-6 col-md-6" style="padding: 0 3px 0">
+        <!-- The Gender chart-->
+        <div class="chart-wrapper">
+          <div class="chart-title">
+            Gender
+            <a onclick="toggle(this, '#gender-help')">[show help]</a>
+            <span id="gender-chart-reset"
+              data-reset-script="javascript:genderChart.filterAll();dc.redrawAll();">
+            </span>
+          </div>
+
+          <div class="chart-notes" id="gender-help" style="display: none">
+            Filter by gender by clicking on the chart. The city reports information for each gender.
+          </div>
+
+          <div class="chart-stage">
+            <div id="gender-chart" style="width: 100%;"></div>
+          </div>
         </div>
       </div>
 
-      <div class="col-xs-12 col-md-5">
+      <div class="col-xs-6 col-md-6" style="padding: 0 2px 0">
+        <!-- The Household chart-->
+        <div class="chart-wrapper">
+          <div class="chart-title">
+            Household
+            <a onclick="toggle(this, '#household-help')">[show help]</a>
+            <span id="household-chart-reset"
+              data-reset-script="javascript:householdChart.filterAll();dc.redrawAll();">
+            </span>
+          </div>
+
+          <div class="chart-notes" id="household-help" style="display: none">
+            Filter by household status
+          </div>
+
+          <div class="chart-stage">
+            <div id="household-chart" style="width: 100%;"></div>
+          </div>
+        </div>
+      </div>
+
+
+      </div>
+
+      <div class="col-xs-12 col-md-4">
         <!-- The Map -->
         <div class="chart-wrapper">
           <div class="chart-title">
@@ -96,7 +146,7 @@
           </div>
           <div class="chart-stage">
 
-              <div id="map" style="width: 100%; height: 415px;">
+              <div id="map" style="width: 100%; height: 390px;">
 
             </div>
             <div id='map-anchor'></div>
@@ -141,29 +191,7 @@
 
     <div class="row">
 
-      <div class="col-xs-12 col-md-6">
-        <!-- The Age chart-->
-        <div class="chart-wrapper">
-          <div class="chart-title">
-            Age at death
-            <a onclick="toggle(this, '#age-help')">[show help]</a>
-            <span id="age-chart-reset"
-              data-reset-script="javascript:ageChart.filterAll();dc.redrawAll();">
-            </span>
-          </div>
-
-          <div class="chart-notes" id="age-help" style="display: none">
-            Filter by age
-          </div>
-
-          <div class="chart-stage">
-            <div id="age-chart" ></div>
-          </div>
-        </div>
-      </div>
-
-
-      <div class="col-xs-12 col-md-6">
+      <div class="col-xs-12 col-md-4">
         <!-- The Time chart-->
         <div class="chart-wrapper">
           <div class="chart-title">
@@ -184,51 +212,29 @@
         </div>
       </div>
 
-      <div class="col-xs-12 col-md-3">
-        <!-- The Gender chart-->
+      <div class="col-xs-12 col-md-4">
+        <!-- The Age chart-->
         <div class="chart-wrapper">
           <div class="chart-title">
-            Deaths by gender
-            <a onclick="toggle(this, '#gender-help')">[show help]</a>
-            <span id="gender-chart-reset"
-              data-reset-script="javascript:genderChart.filterAll();dc.redrawAll();">
+            Age at death
+            <a onclick="toggle(this, '#age-help')">[show help]</a>
+            <span id="age-chart-reset"
+              data-reset-script="javascript:ageChart.filterAll();dc.redrawAll();">
             </span>
           </div>
 
-          <div class="chart-notes" id="gender-help" style="display: none">
-            Filter by gender by clicking on the chart. The city reports information for each gender.
+          <div class="chart-notes" id="age-help" style="display: none">
+            Filter by age
           </div>
 
           <div class="chart-stage">
-            <div id="gender-chart" style="width: 100%;"></div>
+            <div id="age-chart" ></div>
           </div>
         </div>
       </div>
 
-      <div class="col-xs-12 col-md-3">
-        <!-- The Household chart-->
-        <div class="chart-wrapper">
-          <div class="chart-title">
-            Deaths by household status
-            <a onclick="toggle(this, '#household-help')">[show help]</a>
-            <span id="household-chart-reset"
-              data-reset-script="javascript:householdChart.filterAll();dc.redrawAll();">
-            </span>
-          </div>
-
-          <div class="chart-notes" id="household-help" style="display: none">
-            Filter by household status
-          </div>
-
-          <div class="chart-stage">
-            <div id="household-chart" style="width: 100%;"></div>
-          </div>
-        </div>
-      </div>
-
-
-      <div class="col-xs-12 col-md-6">
-        <!-- The Household chart-->
+      <div class="col-xs-12 col-md-4">
+        <!-- The year chart-->
         <div class="chart-wrapper">
           <div class="chart-title">
             Deaths by year
