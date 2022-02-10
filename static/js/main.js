@@ -1,6 +1,6 @@
 Promise.all(
   [d3.json("data/wards"),
-  d3.json("data/alone"),
+  d3.csv("data/alone"),
   d3.json("data/total"),
   ]).then(makeDashboard);
 
@@ -28,10 +28,11 @@ function makeDashboard(data) {
   var ndx = crossfilter(alone);
 
   // Define x-axis dimensions of plots
-  var yearDim = ndx.dimension(function(d) {return +d["year"];})
+  var yearDim = ndx.dimension(function(d) {return +d["year"]+2000;})
+  // bug here with the csv the csv has turned 01 to 1
   var wardDim = ndx.dimension(function (d) { return shortToName[d["ward"]]; })
-  var genderDim = ndx.dimension(function (d) { return d["gender"]; })
-  var householdDim = ndx.dimension(function (d) { return d["household"]; })
+  var genderDim = ndx.dimension(function (d) { if (d["gender"] == 'm'){return "Men";} else if (d["gender"]=='w'){return "Women";}})
+  var householdDim = ndx.dimension(function (d) { if (d["household"] == 'm'){return "with Others";} else if (d["household"]=='s'){return "Living alone";}})
   var ageDim = ndx.dimension(function (d) { return d["age"]; })
   var timeDim = ndx.dimension(function (d) { return d["time"]; })
 
@@ -48,12 +49,12 @@ function makeDashboard(data) {
   var deathsByWard = wardDim.group().reduce(
     function (p, v) {
       ++p.count;
-      p.normalized_count += 1/total[v.year][v.ward]
+      p.normalized_count += 1/total[+v.year+2000][v.ward]
       return p;
     },
     function (p, v) {
       --p.count;
-      p.normalized_count -= 1/total[v.year][v.ward]
+      p.normalized_count -= 1/total[+v.year+2000][v.ward]
       return p;
     },
     function () { return {count:0,normalized_count:0}; }
@@ -63,12 +64,12 @@ function makeDashboard(data) {
     var deathsByYear = yearDim.group().reduce(
       function (p, v) {
         ++p.count;
-        p.normalized_count += 1/total_per_year[v.year]
+        p.normalized_count += 1/total_per_year[+v.year+2000]
         return p;
       },
       function (p, v) {
         --p.count;
-        p.normalized_count -= 1/total_per_year[v.year]
+        p.normalized_count -= 1/total_per_year[+v.year+2000]
         return p;
       },
       function () { return {count:0,normalized_count:0}; }

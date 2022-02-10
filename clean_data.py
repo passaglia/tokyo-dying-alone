@@ -1,6 +1,21 @@
 import pandas as pd
 import numpy as np
 
+def compress(df):
+    def age_renamer(d):
+        if d == '0-14':
+            return 10+2
+        if d == '>84':
+            return 85+2
+        return int(d.split('-')[0])+2
+
+    df['age'] = df['age'].map(age_renamer)
+    df['gender'] = df['gender'].replace('women','w').replace('men','m')
+    df['household'] = df['household'].replace('single','s').replace('multi','m')
+    df['year'] = df['year']-2000
+    return df
+
+
 def generate_simulated_data(age_df, time_df):
 
     assert (sum(time_df.sum(axis=0)[1:]) == sum(age_df.sum(axis=0)[1:]))
@@ -204,7 +219,7 @@ def clean_total_deaths(df):
 
     # all the remaining wards are in the right order so replace the name by the index+1 to yield the short_code used in the ward json
     for i in range(len(df['ward_jp'])):
-        df.loc[i,'ward_jp'] = str(i + 1).zfill(2) 
+        df.loc[i,'ward_jp'] = str(i + 1)
     df=df.rename(columns={'ward_jp':'short_code'})
 
     df = df.set_index('short_code')
@@ -216,8 +231,8 @@ if __name__ == '__main__':
     # read the original data for each ward
     wards = [str(i+1).zfill(2) for i in range(23)]
     years = ['H'+str(i) for i in range(15,31)] + ['R1']
-    yearsToWestern = dict([('H'+str(i), str(i + 1988)) for i in range(15,31)] )
-    yearsToWestern['R1'] ='2019'
+    yearsToWestern = dict([('H'+str(i), i + 1988) for i in range(15,31)] )
+    yearsToWestern['R1'] =2019
     precleanagefunctions = dict([(year, preclean_age) for year in years])
     precleanagefunctions.update({'H20': H22_preclean_age, 'H21': H22_preclean_age, 'H22': H22_preclean_age,'H28':H28_preclean_age})
     precleantimefunctions = dict([(year, preclean_time) for year in years])
@@ -276,16 +291,9 @@ if __name__ == '__main__':
     #combine all the ward data into a 3D dataframe    
     all_wards_all_years = pd.concat(dataframes, axis=0, ignore_index=True)
     
-    def age_renamer(d):
-        if d == '0-14':
-            return 10+2
-        if d == '>84':
-            return 85+2
-        return int(d.split('-')[0])+2
+    all_wards_all_years = compress(all_wards_all_years)
 
-    all_wards_all_years['age'] = all_wards_all_years['age'].map(age_renamer)
-
-    all_wards_all_years.to_json('data/alone/deaths_alone.json.gz',compression='gzip')
+    all_wards_all_years.to_csv('data/alone/deaths_alone.csv', index=False)
 
     # # read the total deaths data
     df = pd.read_csv('./rawdata/shibou.csv', encoding="UTF-8")

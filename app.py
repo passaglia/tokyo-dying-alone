@@ -21,11 +21,11 @@ def get_data():
     # Load in the json file we made with clean_data.py
     filename = os.path.join(
         curr_dir, 'data/alone',
-        'deaths_alone.json.gz')
-    df = pd.read_json(filename, dtype=False)
+        'deaths_alone.csv')
+    df = pd.read_csv(filename)
 
     # return it 
-    return df.to_json(orient='records')
+    return df.to_csv(index=False)
 
 # Route to access ward list
 @app.route("/data/wards")
