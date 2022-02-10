@@ -94,7 +94,7 @@ function makeDashboard(data) {
     .x(d3.scaleBand())
     .elasticY(true)
     .width(null)
-    .height(150)
+    .height(170)
     .margins({ top: 30, right: 30, bottom: 30, left: 65 })
     .on('filtered', function (chart) {
       toggleReset(chart, 'gender-chart-reset');
@@ -112,7 +112,7 @@ function makeDashboard(data) {
     .x(d3.scaleBand())
     .elasticY(true)
     .width(null)
-    .height(150)
+    .height(170)
     .margins({ top: 30, right: 30, bottom: 30, left: 65 })
     .on('filtered', function (chart) {
       toggleReset(chart, 'household-chart-reset');
@@ -254,7 +254,7 @@ function makeDashboard(data) {
   nonmap_chartlist = [wardChart, householdChart, ageChart, timeChart, genderChart, yearChart]
 
   // Initialize the map
-  const mapLat_ini = 35.665; // Tokyo
+  const mapLat_ini = 35.67; // Tokyo
   const mapLong_ini = 139.75; // Tokyo
   const mapZoom_ini = 10.5;
   const box_half_side = .2;
@@ -371,7 +371,6 @@ function makeDashboard(data) {
     .colors(d3.scaleSequential(d3.interpolateBlues))
     .colorAccessor(function (d, i) {
       if (normalize) {
-        //return +d.value / total_deaths_this_year[nameToShort[d.key]];
         return +d.value.normalized_count;
 
       }
@@ -385,8 +384,6 @@ function makeDashboard(data) {
     .on('preRedraw', function () {
       choro.calculateColorDomain();
     })
-    // TODO: this legend looks like shit
-    .legend(dc_leaflet.legend().position('bottomright'))
     .featureKeyAccessor(function (feature) {
       return feature.properties.ward_en;
     })

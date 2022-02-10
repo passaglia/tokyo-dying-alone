@@ -94,3 +94,4 @@ https://stackoverflow.com/questions/22184013/dc-js-multiple-graphs-in-a-single-d
 
 -- clean up the code and add comments
 
+-- Fill out [show help]
