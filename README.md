@@ -90,8 +90,6 @@ https://stackoverflow.com/questions/22184013/dc-js-multiple-graphs-in-a-single-d
 
 -- Adjust chart style (x-axis, ticks, colors, etc)
 
--- Hide the age chart when time chart is selected and vice-versa
-
 -- move my choropleth function to a standalone file / fork the git
 
 -- clean up the code and add comments

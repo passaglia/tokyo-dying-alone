@@ -59,8 +59,7 @@
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-          <a href="javascript:dc.filterAll();dc.redrawAll();ward_lock = false;info.update();">[reset
-            all]</a>
+          <a href="javascript:dc.filterAll();dc.redrawAll();ward_lock = false;info.update();">[reset all]</a>
         </li>
       </ul>
     </div>
@@ -208,6 +207,7 @@
 
           <div class="chart-stage">
             <div id="time-chart" ></div>
+            <div id="time-chart-hider" style="display: none">The data is insufficiently detailed to permit crossfiltering of age and time-to-discovery data. To restore this chart, <a href="javascript:ageChart.filterAll();dc.redrawAll();">[reset the age chart]</a>. </div> 
           </div>
         </div>
       </div>
@@ -229,6 +229,8 @@
 
           <div class="chart-stage">
             <div id="age-chart" ></div>
+            <div id="age-chart-hider" style="display: none">The data is insufficiently detailed to permit crossfiltering of age and time-to-discovery data. To restore this chart, <a href="javascript:timeChart.filterAll();dc.redrawAll();">[reset the time chart]</a>. </div> 
+
           </div>
         </div>
       </div>
