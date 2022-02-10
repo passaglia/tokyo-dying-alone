@@ -73,7 +73,7 @@ function makeDashboard(data) {
   
   // For deaths by we use a hack to allow ordinal plots to be brushed
   var deathsByTime = timeDim.group().reduceCount();
-  keysToIntegers  = {}
+  keysToIntegers = {}
   integersToKeys = {}
   keys = deathsByTime.top(Infinity).map(d => d.key)
   integers = d3.range(keys.length)
@@ -102,7 +102,7 @@ function makeDashboard(data) {
     .addFilterHandler(function(filters, filter) {return [filter];}) // allow single filter only
     .yAxis().ticks(4);
     
-  // Deaths by Household Status Chart
+  // Deaths by Household Chart
   householdChart = dc.barChart("#household-chart");
   householdChart
     .yAxisLabel("Deaths")
@@ -137,6 +137,13 @@ function makeDashboard(data) {
     .margins({ top: 10, right: 10, bottom: 50, left: 65 })
     .on('filtered', function (chart) {
       toggleReset(chart, 'time-chart-reset');
+      var filters = chart.filters();
+      if (filters.length) {
+        $("#age-chart").hide();
+      }
+      else{
+        $("#age-chart").show();
+      }
     })
     .yAxis().ticks(4);
   
@@ -160,6 +167,13 @@ function makeDashboard(data) {
     .margins({ top: 10, right: 10, bottom: 50, left: 45 })
     .on('filtered', function (chart) {
       toggleReset(chart, 'age-chart-reset');
+      var filters = chart.filters();
+      if (filters.length) {
+        $("#time-chart").hide();
+      }
+      else{
+        $("#time-chart").show();
+      }
     })
     .yAxis().ticks(4);
 
