@@ -11,8 +11,10 @@ function makeDashboard(data) {
 
   // Generate dictionaries which match ward digits to names using the wards geojson
   shortToName = {};
+  nameToShort = {}
   _.each(wards.features, function (d) {
     shortToName[d.properties.short_code] = d.properties.ward_en;
+    nameToShort[d.properties.ward_en] = d.properties.short_code;
   });
 
   // Get total deaths per year
@@ -39,39 +41,10 @@ function makeDashboard(data) {
   var deathsByAge = ageDim.group().reduceCount();
   var deathsByGender = genderDim.group().reduceCount();
   var deathsByHousehold = householdDim.group().reduceCount();
-
-  // For the deathsByWard we want to enable switching between normalized and unnormalized
-  // so we use a custom reduce
-  var deathsByWard = wardDim.group().reduce(
-    function (p, v) {
-      ++p.count;
-      p.normalized_count += 1/total[+v.year+2000][v.ward]
-      return p;
-    },
-    function (p, v) {
-      --p.count;
-      p.normalized_count -= 1/total[+v.year+2000][v.ward]
-      return p;
-    },
-    function () { return {count:0,normalized_count:0}; }
-  );
-
-  // Same for deathsByYear
-  var deathsByYear = yearDim.group().reduce(
-    function (p, v) {
-      ++p.count;
-      p.normalized_count += 1/total_per_year[+v.year+2000]
-      return p;
-    },
-    function (p, v) {
-      --p.count;
-      p.normalized_count -= 1/total_per_year[+v.year+2000]
-      return p;
-    },
-    function () { return {count:0,normalized_count:0}; }
-  );
+  var deathsByWard = wardDim.group().reduceCount();
+  var deathsByYear = yearDim.group().reduceCount();
   
-  // For deaths by we use a hack to allow ordinal plots to be brushed
+  // For deaths by time we use a hack to allow ordinal plots to be brushed
   var deathsByTime = timeDim.group().reduceCount();
   keysToIntegers = {}
   integersToKeys = {}
@@ -80,7 +53,6 @@ function makeDashboard(data) {
   _.each(integers, function(d){ keysToIntegers[keys[d]] = d; integersToKeys[d] = keys[d]; });
   var ordinalTimeDim = ndx.dimension(function (d) { return keysToIntegers[d["time"]]; })
   var deathsByOrdinalTime = ordinalTimeDim.group().reduceCount();
-
 
   // Now we build each chart
   
@@ -202,21 +174,53 @@ function makeDashboard(data) {
     .height(375)
     .elasticX(true)
     .gap(0)
-    .margins({ top: 10, right: 10, bottom: 40, left: 10 })
+    .margins({ top: 10, right: 10, bottom: 20, left: 10 })
     .valueAccessor(function (kv) {
       if (normalize) {
-        return kv.value.normalized_count;
+        ward_code = nameToShort[kv.key];
+        yearfilters = yearChart.filters();
+        if (yearfilters.length){
+          yearmin = Math.ceil(yearfilters[0][0]);
+          yearmax = Math.floor(yearfilters[0][1]);
+        }
+        else{
+          yearmin = 2003;
+          yearmax = 2019;
+        }
+
+        years = d3.range(yearmin, yearmax+1,1);
+        total_deaths_in_time_range = 0;
+        for (year of years){
+          total_deaths_in_time_range += total[year][ward_code];
+        }
+
+        return kv.value/ total_deaths_in_time_range;
       }
       else {
-        return kv.value.count;
+        return kv.value;
       }
     })
     .ordering(function (kv) {
       if (normalize) {
-        return -kv.value.normalized_count;
+        ward_code = nameToShort[kv.key];
+        yearfilters = yearChart.filters();
+        if (yearfilters.length){
+          yearmin = Math.ceil(yearfilters[0][0]);
+          yearmax = Math.floor(yearfilters[0][1]);
+        }
+        else{
+          yearmin = 2003;
+          yearmax = 2019;
+        }
+        years = d3.range(yearmin, yearmax+1,1);
+        total_deaths_in_time_range = 0;
+        for (year of years){
+          total_deaths_in_time_range += total[year][ward_code];
+        }
+        return -kv.value/ total_deaths_in_time_range;     
       }
       else {
-        return -kv.value.count;
+        return -kv.value;
       }
     })
     .xAxis().ticks(4);
@@ -227,19 +231,19 @@ function makeDashboard(data) {
     .xAxisLabel("Year")
     .dimension(yearDim)
     .group(deathsByYear)
-    .x(d3.scaleLinear().domain([2003, 2019]))
+    .x(d3.scaleLinear().domain([2003, 2020]))
     .elasticY(true)
     .width(null)
     .height(null)
     .brushOn(true)
-    .valueAccessor(function (kv) {
-      if (normalize) {
-        return kv.value.normalized_count;
-      }
-      else {
-        return kv.value.count;
-      }
-    })
+    // .valueAccessor(function (kv) {
+    //   if (normalize) {
+    //     return kv.value.normalized_count;
+    //   }
+    //   else {
+    //     return kv.value.count;
+    //   }
+    // })
     .margins({ top: 10, right: 10, bottom: 50, left: 45 })
     .on('filtered', function (chart) {
       toggleReset(chart, 'year-chart-reset');
@@ -369,13 +373,27 @@ function makeDashboard(data) {
       });
     })
     .colors(d3.scaleSequential(d3.interpolateBlues))
-    .colorAccessor(function (d, i) {
+    .colorAccessor(function (kv, i) {
       if (normalize) {
-        return +d.value.normalized_count;
-
+        ward_code = nameToShort[kv.key];
+        yearfilters = yearChart.filters();
+        if (yearfilters.length){
+          yearmin = Math.ceil(yearfilters[0][0]);
+          yearmax = Math.floor(yearfilters[0][1]);
+        }
+        else{
+          yearmin = 2003;
+          yearmax = 2019;
+        }
+        years = d3.range(yearmin, yearmax+1,1);
+        total_deaths_in_time_range = 0;
+        for (year of years){
+          total_deaths_in_time_range += total[year][ward_code];
+        }
+        return +kv.value/ total_deaths_in_time_range;
       }
       else {
-        return +d.value.count;
+        return +kv.value;
       }
     })
     .on('preRender', function () {
@@ -390,7 +408,7 @@ function makeDashboard(data) {
     .popupMod('ctrlCmd')
     .renderPopup(true)
     .popup(function (d, feature) {
-      return feature.properties.ward_en + " : " + d.value.count;
+      return feature.properties.ward_en + " : " + d.value;
     });
 
   // Detect if the user clicked outside the geojson and if the ward is locked then unlock
@@ -511,22 +529,22 @@ function makeDashboard(data) {
   new ResizeObserver(callback(yearChart)).observe(d3.select('#year-chart').node());
   new ResizeObserver(callback(timeChart)).observe(d3.select('#time-chart').node());
   new ResizeObserver(callback(wardChart)).observe(d3.select('#ward-chart').node());
-  // new ResizeObserver(callback(householdChart)).observe(d3.select('#household-chart').node());
-  // new ResizeObserver(callback(genderChart)).observe(d3.select('#gender-chart').node());
+  new ResizeObserver(callback(householdChart)).observe(d3.select('#household-chart').node());
+  new ResizeObserver(callback(genderChart)).observe(d3.select('#gender-chart').node());
 
-  // Helper function to add x-axis labels
-  function addXAxis(chartToUpdate, displayText) {
-    chartToUpdate.svg()
-              .append("text")
-              .attr("class", "x-axis-label")
-              .attr("text-anchor", "middle")
-              .attr("x", chartToUpdate.width()/2)
-              .attr("y", chartToUpdate.height()-7)
-              .text(displayText);
-  }
+  // // Helper function to add x-axis labels
+  // function addXAxis(chartToUpdate, displayText) {
+  //   chartToUpdate.svg()
+  //             .append("text")
+  //             .attr("class", "x-axis-label")
+  //             .attr("text-anchor", "middle")
+  //             .attr("x", chartToUpdate.width()/2)
+  //             .attr("y", chartToUpdate.height()-7)
+  //             .text(displayText);
+  // }
 
-  // Add x axis labels
-  addXAxis(wardChart, "Deaths");
+  // // Add x axis labels
+  // addXAxis(wardChart, "Deaths");
 
 
 }
