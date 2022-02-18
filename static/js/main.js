@@ -1,13 +1,20 @@
 Promise.all(
   [d3.json("data/wards"),
-  d3.csv("data/alone"),
+  fetch("data/alone")
+    .then(response =>response.arrayBuffer()),
   d3.json("data/total"),
+  //d3.csv("data/alone_uncompressed")
   ]).then(makeDashboard);
 
 function makeDashboard(data) {
-  wards = data[0]
-  alone = data[1]
-  total = data[2]
+  wards = data[0];
+  aloneArrayBuffer = data[1];
+  total = data[2];
+  //alone = data[3]
+
+  compressed_file = new Uint8Array(aloneArrayBuffer);
+  decompressed_file = fflate.strFromU8(fflate.decompressSync(compressed_file));
+  alone = d3.csvParse(decompressed_file)
 
   // Generate dictionaries which match ward digits to names using the wards geojson
   shortToName = {};
@@ -31,7 +38,7 @@ function makeDashboard(data) {
 
   // Define x-axis dimensions of plots
   var yearDim = ndx.dimension(function(d) {return +d["year"]+2000;})
-  var wardDim = ndx.dimension(function (d) { return shortToName[d["ward"]]; })
+  var wardDim = ndx.dimension(function (d) { return shortToName[+d["ward"]]; })
   var genderDim = ndx.dimension(function (d) { if (d["gender"] == 'm'){return "Men";} else if (d["gender"]=='w'){return "Women";}})
   var householdDim = ndx.dimension(function (d) { if (d["household"] == 'm'){return "with Others";} else if (d["household"]=='s'){return "Living alone";}})
   var ageDim = ndx.dimension(function (d) { return d["age"]; })
