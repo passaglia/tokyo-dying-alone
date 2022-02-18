@@ -3,15 +3,14 @@ Promise.all(
   fetch("data/alone")
     .then(response =>response.arrayBuffer()),
   d3.json("data/total"),
-  //d3.csv("data/alone_uncompressed")
   ]).then(makeDashboard);
 
 function makeDashboard(data) {
   wards = data[0];
   aloneArrayBuffer = data[1];
   total = data[2];
-  //alone = data[3]
 
+  // The largest data file is loaded in compressed and decompressed here
   compressed_file = new Uint8Array(aloneArrayBuffer);
   decompressed_file = fflate.strFromU8(fflate.decompressSync(compressed_file));
   alone = d3.csvParse(decompressed_file)
@@ -61,8 +60,10 @@ function makeDashboard(data) {
   var ordinalTimeDim = ndx.dimension(function (d) { return keysToIntegers[d["time"]]; })
   var deathsByOrdinalTime = ordinalTimeDim.group().reduceCount();
 
+  /////
   // Now we build each chart
-  
+  /////
+
   // Deaths by Gender Chart
   genderChart = dc.barChart("#gender-chart");
   genderChart
@@ -128,7 +129,6 @@ function makeDashboard(data) {
     .yAxis().ticks(4);
   
   timeChart.xAxis()
-    //.tickValues(d3.range(mappings.length()))
     .tickFormat(function(d) { return integersToKeys[d]; });
 
   // Deaths by Age Chart
@@ -164,11 +164,10 @@ function makeDashboard(data) {
     .tickFormat(function(d) { 
       if (d == 12) {return '<15'};
       if (d == 87) {return '>84'}; 
-
     return d; });
 
 
-  // state variable for normalization 
+  // state variables for plot-switching 
   var wardNormalize = false;
   var yearNormalize = false;
 
@@ -267,7 +266,6 @@ function makeDashboard(data) {
   
   var xAxis = yearChart.xAxis().ticks(8).tickFormat(d3.format("d"));
 
-  
   // List of charts to update when the map is hovered over
   // because redrawing the map itself is a little slow
   nonmap_chartlist = [wardChart, householdChart, ageChart, timeChart, genderChart, yearChart]
@@ -312,17 +310,46 @@ function makeDashboard(data) {
   };
 
   // Create info div to show ward on hover
-  var info = L.control();
+  var info = L.control({ position: 'bottomleft' });
   info.onAdd = function (map) {
     this._div = L.DomUtil.create('div', 'info');
     this.update();
     return this._div;
   };
   // Specify update for info legend
-  info.update = function (props) {
-    if (props) {
+  info.update = function (ward_en) {
+    if (ward_en) { 
+      var deaths = 0;
+      var normalized_deaths = 0;
+      //_.each(deathsByWard.top(Infinity), function (kv) { if (kv.key == ward_en){deaths=kv.value}})
+      deathsByWard.top(Infinity).every( function (kv) { if (kv.key == ward_en){
+        deaths = kv.value; 
+        yearfilters = yearChart.filters();
+        if (yearfilters.length){
+          yearmin = Math.ceil(yearfilters[0][0]);
+          yearmax = Math.floor(yearfilters[0][1]);
+        }
+        else{
+          yearmin = 2003;
+          yearmax = 2019;
+        }
+        years = d3.range(yearmin, yearmax+1,1);
+        total_deaths_in_time_range = 0;
+        for (year of years){
+          total_deaths_in_time_range += total[year][nameToShort[kv.key]];
+        }
+        normalized_deaths = kv.value/ total_deaths_in_time_range;
+
+        return false;
+      }
+      else{
+        return true;
+      }});
+
       this._div.style.visibility = "visible";
-      this._div.innerHTML = '<h4>' + props.ward_en + ' Ward </h4>';  // TODO: Figure out how to add the deaths from the current slice
+      this._div.innerHTML = '<h4>' + ward_en + ' Ward </h4>' +
+      '<p>' + deaths  + " dead in current slice </p>" +
+      '<p>' + (normalized_deaths*100).toFixed(1) + "% of all deaths in ward </p>"; 
     } else {
       this._div.style.visibility = "hidden";
     }
@@ -347,7 +374,7 @@ function makeDashboard(data) {
       layer.on("mouseover", function (event) {
         if (!(ward_lock)) {
           this.setStyle(highlightedStyle);
-          info.update(this.feature.properties);
+          info.update(this.feature.properties.ward_en);
           wardChart.replaceFilter([[this.feature.properties.ward_en]]);
           choro.replaceFilter([[this.feature.properties.ward_en]]);
           _.each(nonmap_chartlist, function (chart) { chart.redraw(); });
@@ -367,7 +394,7 @@ function makeDashboard(data) {
         if (ward_lock) {
           ward_lock = false;
           locked_ward_en = null;
-          info.update(this.feature.properties);
+          info.update(this.feature.properties.ward_en);
           wardChart.replaceFilter([[]]);
           choro.replaceFilter([[]]);
           choro.geojsonLayer().eachLayer(function (layer) { layer.setStyle(unhighlightedStyle); })
@@ -375,7 +402,7 @@ function makeDashboard(data) {
         else {
           ward_lock = true;
           locked_ward_en = this.feature.properties.ward_en;
-          info.update(this.feature.properties);
+          info.update(this.feature.properties.ward_en);
           wardChart.replaceFilter([[this.feature.properties.ward_en]]);
           choro.replaceFilter([[this.feature.properties.ward_en]]);
           choro.geojsonLayer().eachLayer(function (layer) {
@@ -415,6 +442,9 @@ function makeDashboard(data) {
     })
     .on('preRedraw', function () {
       choro.calculateColorDomain();
+      if (ward_lock){
+        info.update(locked_ward_en);
+      }
     })
     .featureKeyAccessor(function (feature) {
       return feature.properties.ward_en;
@@ -455,7 +485,7 @@ function makeDashboard(data) {
           //wardChart.replaceFilter([[layer.feature.properties.ward_en]]);
           choro.replaceFilter([[layer.feature.properties.ward_en]]);
           layer.setStyle(highlightedStyle);
-          info.update(layer.feature.properties);
+          info.update(layer.feature.properties.ward_en);
           _.each(nonmap_chartlist, function (chart) { chart.redraw(); });
         }
       })
@@ -493,7 +523,7 @@ function makeDashboard(data) {
           var layer = choro.geojsonLayer().getLayer(wardToLayerID[key]);
 
           locked_ward_en = key;
-          info.update(layer.feature.properties);
+          info.update(layer.feature.properties.ward_en);
           wardChart.replaceFilter([[key]]);
           choro.replaceFilter([[key]]);
           choro.geojsonLayer().eachLayer(function (layer) {

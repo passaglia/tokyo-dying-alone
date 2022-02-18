@@ -143,7 +143,7 @@
             <a onclick="toggle(this, '#map-help')">[show help]</a>
           </div>
           <div class="chart-notes" id="map-help" style="display: none">
-           Hover over each of Tokyo's 23 wards to filter by location of the deceased. Click a ward to lock the filter onto it, and click again anywhere to unlock. Wards are color-coded based on the number of deaths as shown on the ward chart to the right.
+           Hover over Tokyo's 23 wards to filter by death location. Click a ward to lock the filter onto it, and click again anywhere to unlock. Wards are color-coded based on the deaths-by-ward chart.
           </div>
           <div class="chart-stage">
 
@@ -160,8 +160,6 @@
         <!-- The Ward chart -->
         <div class="chart-wrapper">
           <div class="chart-title">
-            <!-- Ward 
-            &nbsp;&nbsp; -->
             <input id="norm-toggle" type="checkbox" data-toggle="toggle"
             data-width=230
             data-on="As a fraction of all deaths"
@@ -179,7 +177,7 @@
           </div>
 
           <div class="chart-notes" id="ward-help" style="display: none">
-            The number of deaths per ward. Click a bar to filter on a ward, and click again to unfilter. Click the title to divide the number of deaths at home by the total number of deaths in each ward the selected time range, which helps account for the different population of each ward.
+            The number of deaths per ward. Click a bar to filter on a ward, and click again to unfilter. Click the title to divide the number of deaths at home by the total number of deaths in each ward, which helps account for the different population of each ward.
           </div>
 
           <div class="chart-stage">
