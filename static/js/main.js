@@ -66,8 +66,8 @@ function makeDashboard(data) {
     .x(d3.scaleBand())
     .elasticY(true)
     .width(null)
-    .height(170)
-    .margins({ top: 30, right: 30, bottom: 30, left: 65 })
+    .height(165)
+    .margins({ top: 25, right: 30, bottom: 30, left: 65 })
     .on('filtered', function (chart) {
       toggleReset(chart, 'gender-chart-reset');
     })
@@ -84,8 +84,8 @@ function makeDashboard(data) {
     .x(d3.scaleBand())
     .elasticY(true)
     .width(null)
-    .height(170)
-    .margins({ top: 30, right: 30, bottom: 30, left: 65 })
+    .height(165)
+    .margins({ top: 25, right: 30, bottom: 30, left: 65 })
     .on('filtered', function (chart) {
       toggleReset(chart, 'household-chart-reset');
     })
@@ -102,10 +102,9 @@ function makeDashboard(data) {
     .x(d3.scaleLinear().domain([-.5,8.5]))
     .xUnits(dc.units.integers)
     .centerBar(true)
-    //.ordering(function(d) {x = d.key.split('-')[0].split('>'); return +x[x.length-1];})
     .elasticY(true)
     .width(null)
-    .height(null)
+    .height(194)
     .margins({ top: 10, right: 10, bottom: 50, left: 65 })
     .on('filtered', function (chart) {
       toggleReset(chart, 'time-chart-reset');
@@ -136,7 +135,7 @@ function makeDashboard(data) {
     .x(d3.scaleLinear().domain([9, 89]))
     .elasticY(true)
     .width(null)
-    .height(null)
+    .height(194)
     .brushOn(true)
     .margins({ top: 10, right: 10, bottom: 50, left: 45 })
     .on('filtered', function (chart) {
@@ -163,7 +162,8 @@ function makeDashboard(data) {
 
 
   // state variable for normalization 
-  var normalize = false;
+  var wardNormalize = false;
+  var yearNormalize = false;
 
   // Deaths by Ward Chart
   wardChart = dc.rowChart("#ward-chart", )
@@ -171,13 +171,12 @@ function makeDashboard(data) {
     .dimension(wardDim)
     .group(deathsByWard)
     .width(null)
-    .height(375)
+    .height(370)
     .elasticX(true)
     .gap(0)
-    .margins({ top: 10, right: 10, bottom: 20, left: 10 })
+    .margins({ top: 5, right: 10, bottom: 20, left: 12 })
     .valueAccessor(function (kv) {
-      if (normalize) {
-        ward_code = nameToShort[kv.key];
+      if (wardNormalize) {
         yearfilters = yearChart.filters();
         if (yearfilters.length){
           yearmin = Math.ceil(yearfilters[0][0]);
@@ -187,13 +186,11 @@ function makeDashboard(data) {
           yearmin = 2003;
           yearmax = 2019;
         }
-
         years = d3.range(yearmin, yearmax+1,1);
         total_deaths_in_time_range = 0;
         for (year of years){
-          total_deaths_in_time_range += total[year][ward_code];
+          total_deaths_in_time_range += total[year][nameToShort[kv.key]];
         }
-
         return kv.value/ total_deaths_in_time_range;
       }
       else {
@@ -201,8 +198,7 @@ function makeDashboard(data) {
       }
     })
     .ordering(function (kv) {
-      if (normalize) {
-        ward_code = nameToShort[kv.key];
+      if (wardNormalize) {
         yearfilters = yearChart.filters();
         if (yearfilters.length){
           yearmin = Math.ceil(yearfilters[0][0]);
@@ -215,7 +211,7 @@ function makeDashboard(data) {
         years = d3.range(yearmin, yearmax+1,1);
         total_deaths_in_time_range = 0;
         for (year of years){
-          total_deaths_in_time_range += total[year][ward_code];
+          total_deaths_in_time_range += total[year][nameToShort[kv.key]];
         }
         return -kv.value/ total_deaths_in_time_range;     
       }
@@ -234,20 +230,29 @@ function makeDashboard(data) {
     .x(d3.scaleLinear().domain([2003, 2020]))
     .elasticY(true)
     .width(null)
-    .height(null)
+    .height(180)
     .brushOn(true)
-    // .valueAccessor(function (kv) {
-    //   if (normalize) {
-    //     return kv.value.normalized_count;
-    //   }
-    //   else {
-    //     return kv.value.count;
-    //   }
-    // })
-    .margins({ top: 10, right: 10, bottom: 50, left: 45 })
+    .valueAccessor(function (kv) {
+      if (yearNormalize) {
+        wardfilters = wardChart.filters();
+        wardfilters = choro.filters();
+        console.log(wardfilters.length)
+        if (wardfilters.length){
+          filteredWard = wardfilters[0];
+          return kv.value/total[kv.key][nameToShort[filteredWard]];
+        }
+        else{
+          return kv.value/Object.values(total[kv.key]).reduce((partialSum, a) => partialSum + a, 0)
+        }
+      }
+      else {
+        return kv.value;
+      }
+    })
+    .margins({ top: 10, right: 15, bottom: 50, left: 45 })
     .on('filtered', function (chart) {
       toggleReset(chart, 'year-chart-reset');
-      if (normalize){
+      if (wardNormalize){
         wardChart.redraw();
       }
     })
@@ -271,7 +276,7 @@ function makeDashboard(data) {
   // map.dragging.disable();
   // map.touchZoom.disable();
   // map.doubleClickZoom.disable();
-  // map.scrollWheelZoom.disable();
+  map.scrollWheelZoom.disable();
   // map.boxZoom.disable();
   // map.keyboard.disable();
 
@@ -377,8 +382,7 @@ function makeDashboard(data) {
     })
     .colors(d3.scaleSequential(d3.interpolateBlues))
     .colorAccessor(function (kv, i) {
-      if (normalize) {
-        ward_code = nameToShort[kv.key];
+      if (wardNormalize) {
         yearfilters = yearChart.filters();
         if (yearfilters.length){
           yearmin = Math.ceil(yearfilters[0][0]);
@@ -391,7 +395,7 @@ function makeDashboard(data) {
         years = d3.range(yearmin, yearmax+1,1);
         total_deaths_in_time_range = 0;
         for (year of years){
-          total_deaths_in_time_range += total[year][ward_code];
+          total_deaths_in_time_range += total[year][nameToShort[kv.key]];
         }
         return +kv.value/ total_deaths_in_time_range;
       }
@@ -510,10 +514,17 @@ function makeDashboard(data) {
     }
   }
 
-  //Toggle Normalization Button
-  var selection = d3.select('#norm-toggle');
-  selection.on('change', function(){
-    normalize = !(normalize);
+  //Toggle Normalization Buttons
+  // For ward chart
+  var wardSelection = d3.select('#norm-toggle');
+  wardSelection.on('change', function(){
+    wardNormalize = !(wardNormalize);
+    dc.redrawAll();
+  });
+ // For year chart
+  var yearSelection = d3.select('#year-norm-toggle');
+  yearSelection.on('change', function(){
+    yearNormalize = !(yearNormalize);
     dc.redrawAll();
   });
 
@@ -528,10 +539,10 @@ function makeDashboard(data) {
             .rescale());
   };
 
-  new ResizeObserver(callback(ageChart)).observe(d3.select('#age-chart').node());
-  new ResizeObserver(callback(yearChart)).observe(d3.select('#year-chart').node());
-  new ResizeObserver(callback(timeChart)).observe(d3.select('#time-chart').node());
-  new ResizeObserver(callback(wardChart)).observe(d3.select('#ward-chart').node());
+  //new ResizeObserver(callback(ageChart)).observe(d3.select('#age-chart').node());
+  //new ResizeObserver(callback(yearChart)).observe(d3.select('#year-chart').node());
+  //new ResizeObserver(callback(timeChart)).observe(d3.select('#time-chart').node());
+  //new ResizeObserver(callback(wardChart)).observe(d3.select('#ward-chart').node());
   // new ResizeObserver(callback(householdChart)).observe(d3.select('#household-chart').node());
   // new ResizeObserver(callback(genderChart)).observe(d3.select('#gender-chart').node());
 

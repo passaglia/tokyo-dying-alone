@@ -67,6 +67,10 @@ body.application hr {
   padding: 8px 10px 5px;
 }
 
+/*
+ * CSS For the Toggle
+ */
+.slow .toggle-group { transition: left 0.7s; -webkit-transition: left 0.7s; }
 
 /*
  * Imported from Nick Hand
