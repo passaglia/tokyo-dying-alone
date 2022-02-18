@@ -13,6 +13,7 @@ def compress(df):
     df['gender'] = df['gender'].replace('women','w').replace('men','m')
     df['household'] = df['household'].replace('single','s').replace('multi','m')
     df['year'] = df['year']-2000
+    
     return df
 
 def generate_simulated_data(age_df, time_df):
@@ -289,8 +290,8 @@ if __name__ == '__main__':
     
     all_wards_all_years = compress(all_wards_all_years)
 
-    all_wards_all_years.to_csv('data/alone/deaths_alone.csv', index=False)
-
+    all_wards_all_years.to_csv('data/alone/deaths_alone.gz', index=False, compression='gzip')
+    
     # # read the total deaths data
     df = pd.read_csv('./rawdata/shibou.csv', encoding="UTF-8")
     cleaned_total = clean_total_deaths(df)

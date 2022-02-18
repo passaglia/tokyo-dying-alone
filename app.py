@@ -1,7 +1,7 @@
 import pandas as pd
 import json
 from flask import Flask
-from flask import render_template, request
+from flask import render_template, send_file
 import os
 
 # current directory
@@ -18,14 +18,11 @@ def index():
 @app.route("/data/alone")
 def get_data():
 
-    # Load in the json file we made with clean_data.py
     filename = os.path.join(
         curr_dir, 'data/alone',
-        'deaths_alone.csv')
-    df = pd.read_csv(filename)
+        'deaths_alone.gz')
 
-    # return it 
-    return df.to_csv(index=False)
+    return send_file(filename)
 
 # Route to access ward list
 @app.route("/data/wards")
@@ -37,7 +34,6 @@ def get_ward_data():
         'wards.geojson')
         
     return json.load(open(filename))
-
 
 # Route to access death list
 @app.route("/data/total")

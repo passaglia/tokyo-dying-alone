@@ -1,13 +1,19 @@
 Promise.all(
   [d3.json("data/wards"),
-  d3.csv("data/alone"),
+  fetch("data/alone")
+    .then(response =>response.arrayBuffer()),
   d3.json("data/total"),
   ]).then(makeDashboard);
 
 function makeDashboard(data) {
-  wards = data[0]
-  alone = data[1]
-  total = data[2]
+  wards = data[0];
+  aloneArrayBuffer = data[1];
+  total = data[2];
+
+  // The largest data file is loaded in compressed and decompressed here
+  compressed_file = new Uint8Array(aloneArrayBuffer);
+  decompressed_file = fflate.strFromU8(fflate.decompressSync(compressed_file));
+  alone = d3.csvParse(decompressed_file)
 
   // Generate dictionaries which match ward digits to names using the wards geojson
   shortToName = {};
@@ -31,7 +37,7 @@ function makeDashboard(data) {
 
   // Define x-axis dimensions of plots
   var yearDim = ndx.dimension(function(d) {return +d["year"]+2000;})
-  var wardDim = ndx.dimension(function (d) { return shortToName[d["ward"]]; })
+  var wardDim = ndx.dimension(function (d) { return shortToName[+d["ward"]]; })
   var genderDim = ndx.dimension(function (d) { if (d["gender"] == 'm'){return "Men";} else if (d["gender"]=='w'){return "Women";}})
   var householdDim = ndx.dimension(function (d) { if (d["household"] == 'm'){return "with Others";} else if (d["household"]=='s'){return "Living alone";}})
   var ageDim = ndx.dimension(function (d) { return d["age"]; })
@@ -54,8 +60,10 @@ function makeDashboard(data) {
   var ordinalTimeDim = ndx.dimension(function (d) { return keysToIntegers[d["time"]]; })
   var deathsByOrdinalTime = ordinalTimeDim.group().reduceCount();
 
+  /////
   // Now we build each chart
-  
+  /////
+
   // Deaths by Gender Chart
   genderChart = dc.barChart("#gender-chart");
   genderChart
@@ -66,8 +74,8 @@ function makeDashboard(data) {
     .x(d3.scaleBand())
     .elasticY(true)
     .width(null)
-    .height(170)
-    .margins({ top: 30, right: 30, bottom: 30, left: 65 })
+    .height(165)
+    .margins({ top: 25, right: 30, bottom: 30, left: 65 })
     .on('filtered', function (chart) {
       toggleReset(chart, 'gender-chart-reset');
     })
@@ -84,8 +92,8 @@ function makeDashboard(data) {
     .x(d3.scaleBand())
     .elasticY(true)
     .width(null)
-    .height(170)
-    .margins({ top: 30, right: 30, bottom: 30, left: 65 })
+    .height(165)
+    .margins({ top: 25, right: 30, bottom: 30, left: 65 })
     .on('filtered', function (chart) {
       toggleReset(chart, 'household-chart-reset');
     })
@@ -102,10 +110,9 @@ function makeDashboard(data) {
     .x(d3.scaleLinear().domain([-.5,8.5]))
     .xUnits(dc.units.integers)
     .centerBar(true)
-    //.ordering(function(d) {x = d.key.split('-')[0].split('>'); return +x[x.length-1];})
     .elasticY(true)
     .width(null)
-    .height(null)
+    .height(194)
     .margins({ top: 10, right: 10, bottom: 50, left: 65 })
     .on('filtered', function (chart) {
       toggleReset(chart, 'time-chart-reset');
@@ -122,7 +129,6 @@ function makeDashboard(data) {
     .yAxis().ticks(4);
   
   timeChart.xAxis()
-    //.tickValues(d3.range(mappings.length()))
     .tickFormat(function(d) { return integersToKeys[d]; });
 
   // Deaths by Age Chart
@@ -136,7 +142,7 @@ function makeDashboard(data) {
     .x(d3.scaleLinear().domain([9, 89]))
     .elasticY(true)
     .width(null)
-    .height(null)
+    .height(194)
     .brushOn(true)
     .margins({ top: 10, right: 10, bottom: 50, left: 45 })
     .on('filtered', function (chart) {
@@ -158,12 +164,12 @@ function makeDashboard(data) {
     .tickFormat(function(d) { 
       if (d == 12) {return '<15'};
       if (d == 87) {return '>84'}; 
-
     return d; });
 
 
-  // state variable for normalization 
-  var normalize = false;
+  // state variables for plot-switching 
+  var wardNormalize = false;
+  var yearNormalize = false;
 
   // Deaths by Ward Chart
   wardChart = dc.rowChart("#ward-chart", )
@@ -171,13 +177,12 @@ function makeDashboard(data) {
     .dimension(wardDim)
     .group(deathsByWard)
     .width(null)
-    .height(375)
+    .height(370)
     .elasticX(true)
     .gap(0)
-    .margins({ top: 10, right: 10, bottom: 20, left: 10 })
+    .margins({ top: 5, right: 10, bottom: 20, left: 12 })
     .valueAccessor(function (kv) {
-      if (normalize) {
-        ward_code = nameToShort[kv.key];
+      if (wardNormalize) {
         yearfilters = yearChart.filters();
         if (yearfilters.length){
           yearmin = Math.ceil(yearfilters[0][0]);
@@ -187,13 +192,11 @@ function makeDashboard(data) {
           yearmin = 2003;
           yearmax = 2019;
         }
-
         years = d3.range(yearmin, yearmax+1,1);
         total_deaths_in_time_range = 0;
         for (year of years){
-          total_deaths_in_time_range += total[year][ward_code];
+          total_deaths_in_time_range += total[year][nameToShort[kv.key]];
         }
-
         return kv.value/ total_deaths_in_time_range;
       }
       else {
@@ -201,8 +204,7 @@ function makeDashboard(data) {
       }
     })
     .ordering(function (kv) {
-      if (normalize) {
-        ward_code = nameToShort[kv.key];
+      if (wardNormalize) {
         yearfilters = yearChart.filters();
         if (yearfilters.length){
           yearmin = Math.ceil(yearfilters[0][0]);
@@ -215,7 +217,7 @@ function makeDashboard(data) {
         years = d3.range(yearmin, yearmax+1,1);
         total_deaths_in_time_range = 0;
         for (year of years){
-          total_deaths_in_time_range += total[year][ward_code];
+          total_deaths_in_time_range += total[year][nameToShort[kv.key]];
         }
         return -kv.value/ total_deaths_in_time_range;     
       }
@@ -234,25 +236,36 @@ function makeDashboard(data) {
     .x(d3.scaleLinear().domain([2003, 2020]))
     .elasticY(true)
     .width(null)
-    .height(null)
+    .height(180)
     .brushOn(true)
-    // .valueAccessor(function (kv) {
-    //   if (normalize) {
-    //     return kv.value.normalized_count;
-    //   }
-    //   else {
-    //     return kv.value.count;
-    //   }
-    // })
-    .margins({ top: 10, right: 10, bottom: 50, left: 45 })
+    .valueAccessor(function (kv) {
+      if (yearNormalize) {
+        wardfilters = wardChart.filters();
+        wardfilters = choro.filters();
+        console.log(wardfilters.length)
+        if (wardfilters.length){
+          filteredWard = wardfilters[0];
+          return kv.value/total[kv.key][nameToShort[filteredWard]];
+        }
+        else{
+          return kv.value/Object.values(total[kv.key]).reduce((partialSum, a) => partialSum + a, 0)
+        }
+      }
+      else {
+        return kv.value;
+      }
+    })
+    .margins({ top: 10, right: 15, bottom: 50, left: 45 })
     .on('filtered', function (chart) {
       toggleReset(chart, 'year-chart-reset');
+      if (wardNormalize){
+        wardChart.redraw();
+      }
     })
     .yAxis().ticks(4);
   
   var xAxis = yearChart.xAxis().ticks(8).tickFormat(d3.format("d"));
 
-  
   // List of charts to update when the map is hovered over
   // because redrawing the map itself is a little slow
   nonmap_chartlist = [wardChart, householdChart, ageChart, timeChart, genderChart, yearChart]
@@ -268,7 +281,7 @@ function makeDashboard(data) {
   // map.dragging.disable();
   // map.touchZoom.disable();
   // map.doubleClickZoom.disable();
-  // map.scrollWheelZoom.disable();
+  map.scrollWheelZoom.disable();
   // map.boxZoom.disable();
   // map.keyboard.disable();
 
@@ -297,17 +310,46 @@ function makeDashboard(data) {
   };
 
   // Create info div to show ward on hover
-  var info = L.control();
+  var info = L.control({ position: 'bottomleft' });
   info.onAdd = function (map) {
     this._div = L.DomUtil.create('div', 'info');
     this.update();
     return this._div;
   };
   // Specify update for info legend
-  info.update = function (props) {
-    if (props) {
+  info.update = function (ward_en) {
+    if (ward_en) { 
+      var deaths = 0;
+      var normalized_deaths = 0;
+      //_.each(deathsByWard.top(Infinity), function (kv) { if (kv.key == ward_en){deaths=kv.value}})
+      deathsByWard.top(Infinity).every( function (kv) { if (kv.key == ward_en){
+        deaths = kv.value; 
+        yearfilters = yearChart.filters();
+        if (yearfilters.length){
+          yearmin = Math.ceil(yearfilters[0][0]);
+          yearmax = Math.floor(yearfilters[0][1]);
+        }
+        else{
+          yearmin = 2003;
+          yearmax = 2019;
+        }
+        years = d3.range(yearmin, yearmax+1,1);
+        total_deaths_in_time_range = 0;
+        for (year of years){
+          total_deaths_in_time_range += total[year][nameToShort[kv.key]];
+        }
+        normalized_deaths = kv.value/ total_deaths_in_time_range;
+
+        return false;
+      }
+      else{
+        return true;
+      }});
+
       this._div.style.visibility = "visible";
-      this._div.innerHTML = '<h4>' + props.ward_en + ' Ward </h4>';  // TODO: Figure out how to add the deaths from the current slice
+      this._div.innerHTML = '<h4>' + ward_en + ' Ward </h4>' +
+      '<p>' + deaths  + " dead in current slice </p>" +
+      '<p>' + (normalized_deaths*100).toFixed(1) + "% of all deaths in ward </p>"; 
     } else {
       this._div.style.visibility = "hidden";
     }
@@ -332,7 +374,7 @@ function makeDashboard(data) {
       layer.on("mouseover", function (event) {
         if (!(ward_lock)) {
           this.setStyle(highlightedStyle);
-          info.update(this.feature.properties);
+          info.update(this.feature.properties.ward_en);
           wardChart.replaceFilter([[this.feature.properties.ward_en]]);
           choro.replaceFilter([[this.feature.properties.ward_en]]);
           _.each(nonmap_chartlist, function (chart) { chart.redraw(); });
@@ -352,7 +394,7 @@ function makeDashboard(data) {
         if (ward_lock) {
           ward_lock = false;
           locked_ward_en = null;
-          info.update(this.feature.properties);
+          info.update(this.feature.properties.ward_en);
           wardChart.replaceFilter([[]]);
           choro.replaceFilter([[]]);
           choro.geojsonLayer().eachLayer(function (layer) { layer.setStyle(unhighlightedStyle); })
@@ -360,7 +402,7 @@ function makeDashboard(data) {
         else {
           ward_lock = true;
           locked_ward_en = this.feature.properties.ward_en;
-          info.update(this.feature.properties);
+          info.update(this.feature.properties.ward_en);
           wardChart.replaceFilter([[this.feature.properties.ward_en]]);
           choro.replaceFilter([[this.feature.properties.ward_en]]);
           choro.geojsonLayer().eachLayer(function (layer) {
@@ -374,8 +416,7 @@ function makeDashboard(data) {
     })
     .colors(d3.scaleSequential(d3.interpolateBlues))
     .colorAccessor(function (kv, i) {
-      if (normalize) {
-        ward_code = nameToShort[kv.key];
+      if (wardNormalize) {
         yearfilters = yearChart.filters();
         if (yearfilters.length){
           yearmin = Math.ceil(yearfilters[0][0]);
@@ -388,7 +429,7 @@ function makeDashboard(data) {
         years = d3.range(yearmin, yearmax+1,1);
         total_deaths_in_time_range = 0;
         for (year of years){
-          total_deaths_in_time_range += total[year][ward_code];
+          total_deaths_in_time_range += total[year][nameToShort[kv.key]];
         }
         return +kv.value/ total_deaths_in_time_range;
       }
@@ -401,6 +442,9 @@ function makeDashboard(data) {
     })
     .on('preRedraw', function () {
       choro.calculateColorDomain();
+      if (ward_lock){
+        info.update(locked_ward_en);
+      }
     })
     .featureKeyAccessor(function (feature) {
       return feature.properties.ward_en;
@@ -441,7 +485,7 @@ function makeDashboard(data) {
           //wardChart.replaceFilter([[layer.feature.properties.ward_en]]);
           choro.replaceFilter([[layer.feature.properties.ward_en]]);
           layer.setStyle(highlightedStyle);
-          info.update(layer.feature.properties);
+          info.update(layer.feature.properties.ward_en);
           _.each(nonmap_chartlist, function (chart) { chart.redraw(); });
         }
       })
@@ -479,7 +523,7 @@ function makeDashboard(data) {
           var layer = choro.geojsonLayer().getLayer(wardToLayerID[key]);
 
           locked_ward_en = key;
-          info.update(layer.feature.properties);
+          info.update(layer.feature.properties.ward_en);
           wardChart.replaceFilter([[key]]);
           choro.replaceFilter([[key]]);
           choro.geojsonLayer().eachLayer(function (layer) {
@@ -507,10 +551,17 @@ function makeDashboard(data) {
     }
   }
 
-  //Toggle Normalization Button
-  var selection = d3.select('#norm-toggle');
-  selection.on('change', function(){
-    normalize = !(normalize);
+  //Toggle Normalization Buttons
+  // For ward chart
+  var wardSelection = d3.select('#norm-toggle');
+  wardSelection.on('change', function(){
+    wardNormalize = !(wardNormalize);
+    dc.redrawAll();
+  });
+ // For year chart
+  var yearSelection = d3.select('#year-norm-toggle');
+  yearSelection.on('change', function(){
+    yearNormalize = !(yearNormalize);
     dc.redrawAll();
   });
 
@@ -525,12 +576,12 @@ function makeDashboard(data) {
             .rescale());
   };
 
-  new ResizeObserver(callback(ageChart)).observe(d3.select('#age-chart').node());
-  new ResizeObserver(callback(yearChart)).observe(d3.select('#year-chart').node());
-  new ResizeObserver(callback(timeChart)).observe(d3.select('#time-chart').node());
-  new ResizeObserver(callback(wardChart)).observe(d3.select('#ward-chart').node());
-  new ResizeObserver(callback(householdChart)).observe(d3.select('#household-chart').node());
-  new ResizeObserver(callback(genderChart)).observe(d3.select('#gender-chart').node());
+  //new ResizeObserver(callback(ageChart)).observe(d3.select('#age-chart').node());
+  //new ResizeObserver(callback(yearChart)).observe(d3.select('#year-chart').node());
+  //new ResizeObserver(callback(timeChart)).observe(d3.select('#time-chart').node());
+  //new ResizeObserver(callback(wardChart)).observe(d3.select('#ward-chart').node());
+  // new ResizeObserver(callback(householdChart)).observe(d3.select('#household-chart').node());
+  // new ResizeObserver(callback(genderChart)).observe(d3.select('#gender-chart').node());
 
   // // Helper function to add x-axis labels
   // function addXAxis(chartToUpdate, displayText) {

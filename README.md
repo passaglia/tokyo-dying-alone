@@ -82,15 +82,10 @@ To test the build locally go into /build and run `npx browser-sync start --serve
 
 ## To do
 
--- Fix the normalize somehow
-https://stackoverflow.com/questions/22184013/dc-js-multiple-graphs-in-a-single-dimension
-
--- Make it easier to see absolute number of deaths. e.g. Add a total number of deaths display box 
+-- Confirm normalize vs some thing from the pdf
 
 -- move my choropleth function to a standalone file / fork the git
 
 -- clean up the code and add comments
-
--- Fill out [show help]
 
 -- Reorganize all the libraries
