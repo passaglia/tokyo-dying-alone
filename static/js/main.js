@@ -529,8 +529,8 @@ function makeDashboard(data) {
   new ResizeObserver(callback(yearChart)).observe(d3.select('#year-chart').node());
   new ResizeObserver(callback(timeChart)).observe(d3.select('#time-chart').node());
   new ResizeObserver(callback(wardChart)).observe(d3.select('#ward-chart').node());
-  new ResizeObserver(callback(householdChart)).observe(d3.select('#household-chart').node());
-  new ResizeObserver(callback(genderChart)).observe(d3.select('#gender-chart').node());
+  // new ResizeObserver(callback(householdChart)).observe(d3.select('#household-chart').node());
+  // new ResizeObserver(callback(genderChart)).observe(d3.select('#gender-chart').node());
 
   // // Helper function to add x-axis labels
   // function addXAxis(chartToUpdate, displayText) {
