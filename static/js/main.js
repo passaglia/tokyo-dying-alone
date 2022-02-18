@@ -247,6 +247,9 @@ function makeDashboard(data) {
     .margins({ top: 10, right: 10, bottom: 50, left: 45 })
     .on('filtered', function (chart) {
       toggleReset(chart, 'year-chart-reset');
+      if (normalize){
+        wardChart.redraw();
+      }
     })
     .yAxis().ticks(4);
   
