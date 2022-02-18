@@ -80,7 +80,6 @@ Deploy: We are now hosted on github pages using Frozen Flask. passaglia.jp/tokyo
 To test the build locally go into /build and run `npx browser-sync start --server'.
 
 
-
 ## To do
 
 -- Fix the normalize somehow
@@ -93,3 +92,5 @@ https://stackoverflow.com/questions/22184013/dc-js-multiple-graphs-in-a-single-d
 -- clean up the code and add comments
 
 -- Fill out [show help]
+
+-- Reorganize all the libraries

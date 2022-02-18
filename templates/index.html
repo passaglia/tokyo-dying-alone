@@ -3,14 +3,14 @@
 <head>
 
   <!-- Global site tag (gtag.js) - Google Analytics -->
-  <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=UA-112039180-1"></script> -->
-  <!-- <script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-KPK8VTHTN1"></script>
+  <script>
     window.dataLayer = window.dataLayer || [];
-    function gtag() { dataLayer.push(arguments); }
+    function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
 
-    gtag('config', 'UA-112039180-1');
-  </script> -->
+    gtag('config', 'G-KPK8VTHTN1');
+  </script>
 
   <title>Dying Alone in Tokyo</title>
 
@@ -74,12 +74,12 @@
         <!-- Intro panel -->
         <div class='panel' style='padding: 5px; margin-bottom:5px'>
           <p style="font-size: 16px"><b>Welcome!</b></p>
-          <p> Every year, the city of Tokyo gathers information about the thousands of its residents who die at home, alone.
-          <b> Explore this data.</b> 
+          <p> Every year, the city of Tokyo gathers information about the thousands of its residents who die at home, often alone and undiscovered for some time.
+          <b> Use this page to explore this data.</b> 
           </p>
 
           <p>
-            The charts on this page are interactive and responsive, allowing the data to be filtered in different ways. Click the `show help' button above each chart for more information.
+            The charts here are interactive, allowing the data to be filtered in different ways. Click `show help' above each chart for more information.
           </p>
 
           <p>
@@ -92,7 +92,7 @@
         <!-- The Gender chart-->
         <div class="chart-wrapper">
           <div class="chart-title">
-            Gender
+            Sex
             <a onclick="toggle(this, '#gender-help')">[show help]</a>
             <span id="gender-chart-reset"
               data-reset-script="javascript:genderChart.filterAll();dc.redrawAll();">
@@ -100,7 +100,7 @@
           </div>
 
           <div class="chart-notes" id="gender-help" style="display: none">
-            Filter by gender by clicking on the chart. The city reports information for each gender.
+            The city reports death information separately for men and women. Filter by clicking on a bar, and click the bar again to unfilter.
           </div>
 
           <div class="chart-stage">
@@ -113,7 +113,7 @@
         <!-- The Household chart-->
         <div class="chart-wrapper">
           <div class="chart-title">
-            Household
+            Household Status
             <a onclick="toggle(this, '#household-help')">[show help]</a>
             <span id="household-chart-reset"
               data-reset-script="javascript:householdChart.filterAll();dc.redrawAll();">
@@ -121,7 +121,7 @@
           </div>
 
           <div class="chart-notes" id="household-help" style="display: none">
-            Filter by household status
+            Some of the deceased lived alone, while some lived with other people. Filter by clicking on a bar, and click the bar again to unfilter.
           </div>
 
           <div class="chart-stage">
@@ -137,11 +137,11 @@
         <!-- The Map -->
         <div class="chart-wrapper">
           <div class="chart-title">
-            Ward Map
+            Map
             <a onclick="toggle(this, '#map-help')">[show help]</a>
           </div>
           <div class="chart-notes" id="map-help" style="display: none">
-            Filter by ward
+           Hover over each of Tokyo's 23 wards to filter by location of the deceased. Click a ward to lock the filter onto it, and click again anywhere to unlock. Wards are color-coded based on the number of deaths as shown on the ward chart to the right.
           </div>
           <div class="chart-stage">
 
@@ -157,13 +157,17 @@
       <div class="col-xs-12 col-md-4">
         <!-- The Ward chart -->
         <div class="chart-wrapper">
+          <style>
+            .slow .toggle-group { transition: left 0.7s; -webkit-transition: left 0.7s; }
+          </style>
           <div class="chart-title">
-            Deaths by ward 
-            &nbsp;&nbsp;
+            <!-- Ward 
+            &nbsp;&nbsp; -->
             <input id="norm-toggle" type="checkbox" data-toggle="toggle"
-            width="100"
-            data-on="Normalized"
-            data-off="Absolute">
+            data-width=260
+            data-on="Relative to all deaths"
+            data-off="Number of deaths at home by ward"
+            data-style="slow">
             <script>
               // This shoots off an event that is that captured in main.js
               $(function() {
@@ -176,7 +180,7 @@
           </div>
 
           <div class="chart-notes" id="ward-help" style="display: none">
-            Filter by ward
+            The number of deaths per ward. Click a bar to filter on a ward, and click again to unfilter. Click the toggle to divide the number of deaths at home by the total number of deaths in each ward in each year, which helps account for the different population of each ward.
           </div>
 
           <div class="chart-stage">
@@ -202,12 +206,12 @@
           </div>
 
           <div class="chart-notes" id="time-help" style="display: none">
-            Filter by time
+            Click and drag across this chart to filter by the amount of time after death it took to discover each person. Due to data limitations, this chart cannot be filtered simultaneously with the age chart.
           </div>
 
           <div class="chart-stage">
             <div id="time-chart" ></div>
-            <div id="time-chart-hider" style="display: none">The data is insufficiently detailed to permit crossfiltering of age and time-to-discovery data. To restore this chart, <a href="javascript:ageChart.filterAll();dc.redrawAll();">[reset the age chart]</a>. </div> 
+            <div id="time-chart-hider" style="display: none"> The data is not detailed enough to permit the crossfiltering of age and time-to-discovery data. To restore this chart, <a href="javascript:ageChart.filterAll();dc.redrawAll();">[reset the age chart]</a>. </div> 
           </div>
         </div>
       </div>
@@ -216,7 +220,7 @@
         <!-- The Age chart-->
         <div class="chart-wrapper">
           <div class="chart-title">
-            Age at death
+            Age
             <a onclick="toggle(this, '#age-help')">[show help]</a>
             <span id="age-chart-reset"
               data-reset-script="javascript:ageChart.filterAll();dc.redrawAll();">
@@ -224,8 +228,7 @@
           </div>
 
           <div class="chart-notes" id="age-help" style="display: none">
-            Filter by age
-          </div>
+            Click and drag across this chart to filter by the age of the deceased in 5-year bins. Due to data limitations, this chart cannot be filtered simultaneously with the time-to-discovery chart.          </div>
 
           <div class="chart-stage">
             <div id="age-chart" ></div>
@@ -239,7 +242,7 @@
         <!-- The year chart-->
         <div class="chart-wrapper">
           <div class="chart-title">
-            Deaths by year
+            Year
             <a onclick="toggle(this, '#year-help')">[show help]</a>
             <span id="year-chart-reset"
               data-reset-script="javascript:yearChart.filterAll();dc.redrawAll();">
@@ -247,7 +250,7 @@
           </div>
 
           <div class="chart-notes" id="year-help" style="display: none">
-            Filter by year
+            Click and drag across this chart to filter by year between 2003 and 2019. When the normalize toggle is enabled, the number of deaths at home in each year will be divided by the total deaths per year, which helps account for the change in Tokyo's population.
           </div>
 
           <div class="chart-stage">
