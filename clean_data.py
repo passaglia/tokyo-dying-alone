@@ -1,34 +1,33 @@
-####
-#### For each ward and year, this script takes in two .csv files describing the number of deaths by age-bracket and deaths-by-time.
-#### Outputs a single cumulative compressed csv containing one row per death.
-####
-#### Also takes in a .csv with statistics about total deaths by ward by year in tokyo and outputs it as a json file
+#
+# For each ward and year, this script takes in two .csv files describing the number of deaths by age-bracket and deaths-by-time.
+# Outputs a single cumulative compressed csv containing one row per death.
+#
+# Also takes in a .csv with statistics about total deaths by ward by year in tokyo and outputs it as a json file
 
 import pandas as pd
 import numpy as np
 
-## csvs for different years have different formats. 
-## preclean functions bring all dataframes to the same format as Heisei 28 (2016)
+# preclean functions bring all csvs to the same format as Heisei 28 (2016)
 def H28_preclean_age(df): return df
 def H28_preclean_time(df): return df
 
-## Heisei 22 data suffers from an encoding problem which has to be fixed
+# Heisei 22 data suffers from an encoding problem which has to be fixed
 def H22_preclean_age(df):
     df = df.rename(
         columns={0: 'age', 1: 'total', 2:'men_single', 3:'men_multi',
         4:'men_total', 5:'women_single', 6:'women_multi', 7: 'women_total'})
     
-    ## list of encodings 
+    # list of encodings 
     encoding_dict = {"cid:16089":"0", "(cid:16092)": "0", "(cid:16093)": "1","(cid:16094)": "2", "(cid:16095)": "3","(cid:16096)":"4", "(cid:16097)": "5","(cid:16098)": "6","(cid:16099)": "7","(cid:16100)": "8",
     "(cid:16101)": "9", "(cid:7763)(cid:16076)": "歳", "(cid:18522)":"~","(cid:18444)":"0", "(cid:18445)":"1","(cid:18446)":"2","(cid:18447)":"3","(cid:18448)":"4","(cid:18449)":"5","(cid:18450)":"6","(cid:18451)":"7","(cid:18452)":"8","(cid:18453)":"9", "(cid:7763)(cid:7053)(cid:8246)(cid:16076)": "歳未満","(cid:7763)(cid:3048)(cid:2902)(cid:16076)":"歳以上",'(cid:10610)(cid:18103)(cid:18103)(cid:18103)(cid:6744)': "all"}
     for column in ["age","total",'men_single','men_multi','men_total', 'women_single','women_multi', 'women_total']:
         for i in range(len(df["age"])):
             for key in encoding_dict:
-                df[column][i] = df[column][i].replace(key, encoding_dict[key]) ## Fix encodings for each row and column of data
+                df[column][i] = df[column][i].replace(key, encoding_dict[key]) # Fix encodings for each row and column of data
         df[column] = df[column].str.replace('(', '').str.replace(')', '')
     
     for column in ["total",'men_single','men_multi','men_total', 'women_single','women_multi', 'women_total']:
-        df[column] =  pd.to_numeric(df[column]) ## Fixes pandas dtype
+        df[column] =  pd.to_numeric(df[column]) # Fixes pandas dtype
 
     return df
 
@@ -38,21 +37,21 @@ def H22_preclean_time(df):
         columns={0: 'time', 1: 'total', 2:'men_single', 3:'men_multi',
         4:'men_total', 5:'women_single', 6:'women_multi', 7: 'women_total'})
     
-    ## list of encodings 
+    # list of encodings 
     encoding_dict = {"(cid:14984)": "1", "(cid:17214)":"~", "(cid:6371)":"日", "(cid:17136)":"0","(cid:17137)":"1", "(cid:17138)":"2", "(cid:17139)":"3",  "(cid:17140)":"4", "(cid:17141)":"5", "(cid:17142)":"6",  "(cid:17143)":"7", "(cid:17144)":"8","(cid:17145)":"9"}
     for column in ["time","total",'men_single','men_multi','men_total', 'women_single','women_multi', 'women_total']:
         for i in range(len(df["time"])):
             for key in encoding_dict:
-                df[column][i] = str(df[column][i]).replace(key, encoding_dict[key]) ## Fix encodings for each row and column of data
+                df[column][i] = str(df[column][i]).replace(key, encoding_dict[key]) # Fix encodings for each row and column of data
     
     df = df.replace('-',0)
 
     for column in ["total",'men_single','men_multi','men_total', 'women_single','women_multi', 'women_total']:
-        df[column] =  pd.to_numeric(df[column]) ## Fixes pandas dtype
+        df[column] =  pd.to_numeric(df[column]) # Fixes pandas dtype
 
     return df
 
-## All other years use these preclean functions
+# All other years use these preclean functions
 def preclean_age(df):
     df = df.rename(
         columns={0: 'age', 1: 'total', 2:'men_single', 3:'men_multi',
@@ -61,7 +60,7 @@ def preclean_age(df):
     df = df.replace('-',0)
 
     for column in ["total",'men_single','men_multi','men_total', 'women_single','women_multi', 'women_total']:
-        df[column] =  pd.to_numeric(df[column]) ## Fixes pandas dtype
+        df[column] =  pd.to_numeric(df[column]) # Fixes pandas dtype
 
     return df
 
@@ -73,38 +72,38 @@ def preclean_time(df):
     df = df.replace('-',0)
 
     for column in ["total",'men_single','men_multi','men_total', 'women_single','women_multi', 'women_total']:
-        df[column] =  pd.to_numeric(df[column])  ## Fixes pandas dtype
+        df[column] =  pd.to_numeric(df[column])  # Fixes pandas dtype
 
     return df
 
-## Extracts only the data we need from the age csvs and runs some consistency checks 
+# Extracts only the data we need from the age csvs and runs some consistency checks 
 def clean_age(df):
 
-    ## fill all the nans with 0
+    # fill all the nans with 0
     df = df.fillna(0)
 
-    ## rename the japanese columns
+    # rename the japanese columns
     df = df.rename(columns={'年齢': 'age', '総数(人)': 'total', 
     '男性／単身世帯(人)':'men_single',  '男性／複数世帯(人)':'men_multi', '男性／小計(人)':'men_total',
     '女性／単身世帯(人)':'women_single', '女性／複数世帯(人)':'women_multi', '女性／小計(人)':'women_total'})
 
-    ## tests that the columns are self-consistent
+    # tests that the columns are self-consistent
     assert (df["men_total"] == (df["men_single"] + df["men_multi"])).all()
     assert (df["women_total"] == (df["women_single"] + df["women_multi"])).all()
     assert (df["total"] == (df["men_total"] + df["women_total"])).all()
 
-    ## replace the japanese age ranges
+    # replace the japanese age ranges
     df['age'] = df['age'].replace('総数', 'all').replace('総   数', 'all').replace('15歳未満', '<15').replace('85歳以上','>84').str.replace("〜",'-').str.replace("~",'-').str.replace("歳","").str.replace("（再掲）／", "").replace("15以上", ">14").replace("65以上", ">64")
 
-    ## check that all the age ranges are self consistent
+    # check that all the age ranges are self consistent
     dft = df.set_index('age').transpose()
     assert (dft['all'] == dft['<15'] + dft['15-19']+dft['20-24']+dft['25-29']+dft['30-34']+dft['35-39']+
     dft['40-44']+dft['45-49']+dft['50-54']+dft['55-59']+dft['60-64']+dft['65-69']+dft['70-74']+dft['75-79']+dft['80-84']+dft['>84']).all()
 
-    ## do more simplifying of the column names
+    # do more simplifying of the column names
     df = df.rename(columns={'men_total': 'men', 'women_total': 'women'})
 
-    ## disgard some rows
+    # disgard some rows
     df = df.set_index('age').drop(["all", "0-14", "15-64", ">64", ">14"], axis=0, errors='ignore').reset_index()
     df['age'] = df['age'].replace('<15', '0-14')
 
@@ -114,7 +113,7 @@ def clean_age(df):
 
     return df
 
-## Extracts only the data we need from the time csvs and runs some consistency checks 
+# Extracts only the data we need from the time csvs and runs some consistency checks 
 def clean_time(df):
 
     # fill all the nans with 0
@@ -148,7 +147,7 @@ def clean_time(df):
 
     return df
 
-## cleans the total deaths csv
+# cleans the total deaths csv
 def clean_total_deaths(df):
 
     # fill all the nans with 0
@@ -176,10 +175,10 @@ def clean_total_deaths(df):
 
     return df 
 
-## To combine the age and time csvs we generate a csv which has one row per person
-## containing ward, year, gender, household, age, time fields
-## These are not real people because the age-time dimension is not given in the input csvs
-## In the dashboard we will therefore have to ban crossfiltering those dimensions. 
+# To combine the age and time csvs we generate a csv which has one row per person
+# containing ward, year, gender, household, age, time fields
+# These are not real people because the age-time dimension is not given in the input csvs
+# In the dashboard we will therefore have to ban crossfiltering those dimensions. 
 def generate_simulated_data(age_df, time_df):
 
     # Check that the age and time csvs have consistent data
@@ -318,12 +317,12 @@ if __name__ == '__main__':
                 if ward == "19":
                     time_df['women_multi'][0] += 6
 
-            ## Simulate the people for each ward/year
+            # Simulate the people for each ward/year
             simulated_data_df = generate_simulated_data(age_df, time_df)
             simulated_data_df['ward'] = ward
             simulated_data_df['year'] = yearsToWestern[year]
 
-            ## add to the list of simulated people
+            # add to the list of simulated people
             dataframes.append(simulated_data_df)
         
     # concatenate the list of simulated people
