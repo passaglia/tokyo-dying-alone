@@ -1,10 +1,8 @@
 # Dying alone in Tokyo, Japan
 
-A data visualization about the `Lonely death' problem in Tokyo, available at [passaglia.jp/tokyo-dying-alone](http://passaglia.jp/tokyo-dying-alone).
+A visualization of data about the `Lonely death' problem in Tokyo, available at [passaglia.jp/tokyo-dying-alone](http://passaglia.jp/tokyo-dying-alone).
 
 The dashboard is built with [dc.js](https://dc-js.github.io/dc.js/), [crossfilter](https://github.com/crossfilter/crossfilter), and [leaflet](https://leafletjs.com/). The data cleaning uses [pandas](https://pandas.pydata.org/).
-
-
 
 ## Running the dashboard locally
 
@@ -38,8 +36,6 @@ npx browser-sync start --server
 The deploy.sh shell script automates deployment as a Github Page.
 
 ## To do
-
--- Confirm normalize vs some thing from the pdf
 
 -- move my choropleth function to a standalone file / fork the git
 

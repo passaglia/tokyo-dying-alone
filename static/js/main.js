@@ -166,7 +166,6 @@ function makeDashboard(data) {
       if (d == 87) {return '>84'}; 
     return d; });
 
-
   // state variables for plot-switching 
   var wardNormalize = false;
   var yearNormalize = false;

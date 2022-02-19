@@ -1,5 +1,4 @@
-import pandas as pd
-import json
+
 from flask import Flask
 from flask import render_template, send_file
 import os
@@ -14,13 +13,13 @@ app = Flask(__name__)
 def index():
     return render_template("index.html")
 
-# Route to access alone death data
+# Route to access death-at-home data
 @app.route("/data/alone")
 def get_data():
 
     filename = os.path.join(
         curr_dir, 'data/alone',
-        'deaths_alone.gz')
+        'deaths_alone.gz') # This is compressed and will need to be decompressed in-browser
 
     return send_file(filename)
 
@@ -28,25 +27,21 @@ def get_data():
 @app.route("/data/wards")
 def get_ward_data():
 
-    # Load in the json file
     filename = os.path.join(
         curr_dir, 'data/wards',
         'wards.geojson')
-        
-    return json.load(open(filename))
+    
+    return send_file(filename)
 
-# Route to access death list
+# Route to access total death list
 @app.route("/data/total")
 def get_total_death_data():
 
-    # Load in the json file
     filename = os.path.join(
         curr_dir, 'data/total',
         'shibou.json')
     
-    # return it 
-    return json.load(open(filename))
-
+    return send_file(filename)
 
 if __name__ == "__main__":
     app.run(host='127.0.0.0', port=5000, debug=True)
