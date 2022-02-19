@@ -1,6 +1,6 @@
-# Dying Alone in Tokyo Japan
+# Dying alone in Tokyo, Japan
 
-Repository for [passaglia.jp/tokyo-dying-alone](http://passaglia.jp/tokyo-dying-alone), a data visualization about the `Lonely death' problem in Tokyo, Japan.
+A data visualization about the `Lonely death' problem in Tokyo, available at [passaglia.jp/tokyo-dying-alone](http://passaglia.jp/tokyo-dying-alone).
 
 The dashboard is built with [dc.js](https://dc-js.github.io/dc.js/), [crossfilter](https://github.com/crossfilter/crossfilter), and[leaflet](https://leafletjs.com/). The data cleaning uses [pandas](https://pandas.pydata.org/).
 
@@ -19,9 +19,9 @@ and then open a browser to 127.0.0.1:5000
 
 ## Deploying as a static site
 
-For deployment purposes we use [Frozen-Flask](https://pythonhosted.org/Frozen-Flask/) to convert the Flask app into a static site which can be hosted on [Github Pages](https://docs.github.com/ja/pages/getting-started-with-github-pages/about-github-pages).
+[Frozen-Flask](https://pythonhosted.org/Frozen-Flask/) is used to convert the Flask app into a static site which is hosted using [Github Pages](https://docs.github.com/ja/pages/getting-started-with-github-pages/about-github-pages).
 
-The build can be tested locally, for example by entering /build and running
+The build can be tested locally by entering /build and running
 
 ``` 
 npx browser-sync start --server

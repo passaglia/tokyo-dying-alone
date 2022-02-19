@@ -251,7 +251,7 @@ if __name__ == '__main__':
                 wardlabel = str(int(ward)-1)
             
             encoding = encodings[year]; header = headers[year]
-            age_df = pd.read_csv('./rawdata/' + year + '/age/' + year + '-age-'+wardlabel+'.csv', encoding=encoding, header=header)
+            age_df = pd.read_csv('./data/rawdata/' + year + '/age/' + year + '-age-'+wardlabel+'.csv', encoding=encoding, header=header)
             age_df = precleanagefunctions[year](age_df)
 
             if year == 'H19' and ward == '06':
@@ -263,7 +263,7 @@ if __name__ == '__main__':
 
             age_df = clean_age(age_df)
 
-            time_df = pd.read_csv('./rawdata/' + year + '/time/' + year + '-time-'+wardlabel+'.csv', encoding=encoding, header=header)
+            time_df = pd.read_csv('./data/rawdata/' + year + '/time/' + year + '-time-'+wardlabel+'.csv', encoding=encoding, header=header)
             time_df = precleantimefunctions[year](time_df)
             time_df = clean_time(time_df)
 
@@ -293,6 +293,6 @@ if __name__ == '__main__':
     all_wards_all_years.to_csv('data/alone/deaths_alone.gz', index=False, compression='gzip')
     
     # # read the total deaths data
-    df = pd.read_csv('./rawdata/shibou.csv', encoding="UTF-8")
+    df = pd.read_csv('./data/rawdata/shibou.csv', encoding="UTF-8")
     cleaned_total = clean_total_deaths(df)
     cleaned_total.to_json('data/total/shibou.json')
