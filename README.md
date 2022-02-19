@@ -4,6 +4,8 @@ A data visualization about the `Lonely death' problem in Tokyo, available at [pa
 
 The dashboard is built with [dc.js](https://dc-js.github.io/dc.js/), [crossfilter](https://github.com/crossfilter/crossfilter), and [leaflet](https://leafletjs.com/). The data cleaning uses [pandas](https://pandas.pydata.org/).
 
+
+
 ## Running the dashboard locally
 
 The dashboard can be run locally using the [Flask](https://flask.palletsprojects.com/en/2.0.x/) python framework.
