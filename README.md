@@ -2,7 +2,7 @@
 
 Repository for [passaglia.jp/tokyo-dying-alone](http://passaglia.jp/tokyo-dying-alone), a data visualization about the `Lonely death' problem in Tokyo, Japan.
 
-The dashboard is built with [dc.js](https://dc-js.github.io/dc.js/), [crossfilter](https://github.com/crossfilter/crossfilter), [leaflet](https://leafletjs.com/) and the data cleaning uses [pandas](https://pandas.pydata.org/).
+The dashboard is built with [dc.js](https://dc-js.github.io/dc.js/), [crossfilter](https://github.com/crossfilter/crossfilter), and[leaflet](https://leafletjs.com/). The data cleaning uses [pandas](https://pandas.pydata.org/).
 
 ## Running the dashboard locally
 

@@ -43,7 +43,7 @@ https://catalog.data.metro.tokyo.lg.jp/dataset/t000010d0000000009/resource/e24f4
 
 This project relied on tutorials from [Adil Moujahid](http://adilmoujahid.com/posts/2016/08/interactive-data-visualization-geospatial-d3-dc-leaflet-python/
 ) and [Nick Hand](https://nickhand.github.io/blog/pages/2018/01/23/philly-parking/
-) as well as the 
+) as well as the extensive dc.js and crossfilter Stack Exchange communities including  
 
 http://adilmoujahid.com/posts/2016/08/interactive-data-visualization-geospatial-d3-dc-leaflet-python/
 
