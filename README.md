@@ -1,84 +1,31 @@
-# Map of Tokyo
+# Dying Alone in Tokyo Japan
 
-## Install Guide
-First clone the git repository
+Repository for [passaglia.jp/tokyo-dying-alone](http://passaglia.jp/tokyo-dying-alone), a data visualization about the `Lonely death' problem in Tokyo, Japan.
 
-## Run Guide
-We will use flask which can be installed through pip3
+The dashboard is built with [dc.js](https://dc-js.github.io/dc.js/), [crossfilter](https://github.com/crossfilter/crossfilter), [leaflet](https://leafletjs.com/) and the data cleaning uses [pandas](https://pandas.pydata.org/).
 
-in terminal, run
+## Running the dashboard locally
+
+The dashboard can be run locally using the [Flask](https://flask.palletsprojects.com/en/2.0.x/) python framework.
+
+To do so, in the root directory open a terminal and run
 
 ```
 export FLASK_APP=app.py
 python3 -m flask run
 ```
 
-then open a browser to 127.0.0.1:5000
+and then open a browser to 127.0.0.1:5000
 
-## Data Sources
+## Deploying as a static site
 
-The geographical locations of tokyo's wards are in the geojson format and come from https://github.com/dataofjapan/land/blob/master/tokyo.geojson . This file also includes the -shi which are not part of Tokyo-23, but we don't have death data for them.
+For deployment purposes we use [Frozen-Flask](https://pythonhosted.org/Frozen-Flask/) to convert the Flask app into a static site which can be hosted on [Github Pages](https://docs.github.com/ja/pages/getting-started-with-github-pages/about-github-pages).
 
-The data about deaths alone originates from the Tokyo coroner's office. Their website https://www.fukushihoken.metro.tokyo.lg.jp/kansatsu/kodokushitoukei/index.html implies they have data for several years. However on that website the data is trapped in pdfs. 
+The build can be tested locally, for example by entering /build and running
 
-On the open data catalog website https://catalog.data.metro.tokyo.lg.jp/, however, there are csv files for Heisei 28 (2016). I can ask for data from other years after getting the Heisei 28 data operation.
-
-In particular the three data sets:
-
-Deaths by age: https://catalog.data.metro.tokyo.lg.jp/dataset/t000010d2000000166 . 
-Here I add to url-hack to get the csv for each ward. Each ward is located at 
-https://www.opendata.metro.tokyo.lg.jp/fukushihoken/R3/H28kodokushi0102_XX.csv
-with XX = 01, 02, .., 23. There is a canonical mapping of the wards to digits, which is the last 2 digits of the postal code before the dash. In the geojson file the postal code is in the "code" field and the last two digits before the dash are in the [-3,-2] position because there is one digit after the dash included.
-
-The CSV files are in the Shift JIS encoding. 
-
-Time to discovery total (says Chiyoda-ku but I think it is total): https://catalog.data.metro.tokyo.lg.jp/dataset/t000010d2000000167
-
-Time to discovery by ward:
-https://catalog.data.metro.tokyo.lg.jp/dataset/t000010d2000000168
-
-Population by ward: 
-https://catalog.data.metro.tokyo.lg.jp/dataset/t000003d1900000019
-
-Deaths by Ward:
-https://catalog.data.metro.tokyo.lg.jp/dataset/t000010d0000000009/resource/99d5cb41-a30d-4d3e-85cc-cf316a2a7b26
-
-
-## Data for future projects.
-
-https://catalog.data.metro.tokyo.lg.jp/dataset/t000003d1900000019
-
-Average Age at marriage
-https://catalog.data.metro.tokyo.lg.jp/dataset/t000010d0000000009/resource/e24f4177-3d4a-497e-9c49-4252e8f19221
-
-
-## Related tutorials 
-
-http://adilmoujahid.com/posts/2016/08/interactive-data-visualization-geospatial-d3-dc-leaflet-python/
-
-http://adilmoujahid.com/posts/2015/01/interactive-data-visualization-d3-dc-python-mongodb/
-
-https://nickhand.github.io/blog/pages/2018/01/23/philly-parking/
-
-the bootstrap explanation here is good: https://github.com/austinlyons/dcjs-leaflet-untappd
-
-If I want to do some basic ML
-https://code.visualstudio.com/docs/datascience/data-science-tutorial
-
-
-## Potential future useful stuff
-
-http://urbanspatialanalysis.com/blog/
-
-https://opendata.dc.gov/pages/stories
-
-https://github.com/DCgov
-
-## Deployment
-Deploy: We are now hosted on github pages using Frozen Flask. passaglia.jp/tokyo-dying-alone
-
-To test the build locally go into /build and run `npx browser-sync start --server'.
-
+``` 
+npx browser-sync start --server
+```
 
 ## To do
 
@@ -89,3 +36,4 @@ To test the build locally go into /build and run `npx browser-sync start --serve
 -- clean up the code and add comments
 
 -- Reorganize all the libraries
+
