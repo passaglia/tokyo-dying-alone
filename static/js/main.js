@@ -10,38 +10,29 @@ function makeDashboard(data) {
   aloneArrayBuffer = data[1];
   total = data[2];
 
-  // The largest data file is loaded in compressed and decompressed here
+  // The largest data file is loaded in compressed. Decompress it here
   compressed_file = new Uint8Array(aloneArrayBuffer);
   decompressed_file = fflate.strFromU8(fflate.decompressSync(compressed_file));
-  alone = d3.csvParse(decompressed_file)
+  alone = d3.csvParse(decompressed_file);
 
   // Generate dictionaries which match ward digits to names using the wards geojson
   shortToName = {};
-  nameToShort = {}
+  nameToShort = {};
   _.each(wards.features, function (d) {
     shortToName[d.properties.short_code] = d.properties.ward_en;
     nameToShort[d.properties.ward_en] = d.properties.short_code;
   });
-
-  // Get total deaths per year
-  total_per_year = {};
-  for (var year in total){
-    total_per_year[year] = 0;
-    _.each(wards.features, function (d) {
-      total_per_year[year] +=  total[year][d.properties.short_code];
-    });
-  }
 
   // Create a Crossfilter instance from the dataset
   var ndx = crossfilter(alone);
 
   // Define x-axis dimensions of plots
   var yearDim = ndx.dimension(function(d) {return +d["year"]+2000;})
-  var wardDim = ndx.dimension(function (d) { return shortToName[+d["ward"]]; })
+  var wardDim = ndx.dimension(function (d) { return shortToName[+d["ward"]];})
   var genderDim = ndx.dimension(function (d) { if (d["gender"] == 'm'){return "Men";} else if (d["gender"]=='w'){return "Women";}})
   var householdDim = ndx.dimension(function (d) { if (d["household"] == 'm'){return "with Others";} else if (d["household"]=='s'){return "Living alone";}})
-  var ageDim = ndx.dimension(function (d) { return d["age"]; })
-  var timeDim = ndx.dimension(function (d) { return d["time"]; })
+  var ageDim = ndx.dimension(function (d) { return d["age"];})
+  var timeDim = ndx.dimension(function (d) { return d["time"];})
 
   // Define data groups. These are what will be plotted in each chart.
   var deathsByAge = ageDim.group().reduceCount();
@@ -50,7 +41,7 @@ function makeDashboard(data) {
   var deathsByWard = wardDim.group().reduceCount();
   var deathsByYear = yearDim.group().reduceCount();
   
-  // For deaths by time we use a hack to allow ordinal plots to be brushed
+  // For deaths by time group we use a hack to allow ordinal plots to be brushed by mapping to integers
   var deathsByTime = timeDim.group().reduceCount();
   keysToIntegers = {}
   integersToKeys = {}
@@ -77,7 +68,7 @@ function makeDashboard(data) {
     .height(165)
     .margins({ top: 25, right: 30, bottom: 30, left: 65 })
     .on('filtered', function (chart) {
-      toggleReset(chart, 'gender-chart-reset');
+      toggleReset(chart, 'gender-chart-reset'); // turn on the reset button when the chart is filtered
     })
     .addFilterHandler(function(filters, filter) {return [filter];}) // allow single filter only
     .yAxis().ticks(4);
@@ -95,7 +86,7 @@ function makeDashboard(data) {
     .height(165)
     .margins({ top: 25, right: 30, bottom: 30, left: 65 })
     .on('filtered', function (chart) {
-      toggleReset(chart, 'household-chart-reset');
+      toggleReset(chart, 'household-chart-reset'); // turn on the reset button 
     })
     .addFilterHandler(function(filters, filter) {return [filter];}) // allow single filter only
     .yAxis().ticks(4);
@@ -116,6 +107,8 @@ function makeDashboard(data) {
     .margins({ top: 10, right: 10, bottom: 50, left: 65 })
     .on('filtered', function (chart) {
       toggleReset(chart, 'time-chart-reset');
+      // age chart must be hidden when the time chart is filtered
+      // because that cross-dimension data is fake
       var filters = chart.filters();
       if (filters.length) {
         $("#age-chart").hide();
@@ -147,6 +140,8 @@ function makeDashboard(data) {
     .margins({ top: 10, right: 10, bottom: 50, left: 45 })
     .on('filtered', function (chart) {
       toggleReset(chart, 'age-chart-reset');
+      // time chart must be hidden when the age chart is filtered
+      // because that cross-dimension data is fake
       var filters = chart.filters();
       if (filters.length) {
         $("#time-chart").hide();
@@ -181,6 +176,7 @@ function makeDashboard(data) {
     .gap(0)
     .margins({ top: 5, right: 10, bottom: 20, left: 12 })
     .valueAccessor(function (kv) {
+      // divid by total deaths in time range if the normalize toggle is on
       if (wardNormalize) {
         yearfilters = yearChart.filters();
         if (yearfilters.length){
@@ -238,6 +234,7 @@ function makeDashboard(data) {
     .height(180)
     .brushOn(true)
     .valueAccessor(function (kv) {
+      // divide by total deaths in ward if normalize is toggled
       if (yearNormalize) {
         wardfilters = wardChart.filters();
         wardfilters = choro.filters();
@@ -277,12 +274,7 @@ function makeDashboard(data) {
   bounds = L.latLngBounds(L.latLng(mapLat_ini-box_half_side, mapLong_ini-box_half_side),
   L.latLng(mapLat_ini+box_half_side, mapLong_ini+box_half_side));
   var map = L.map('map', { zoomSnap: .25, zoomDelta: .5, maxBounds: bounds}).setView([mapLat_ini, mapLong_ini], mapZoom_ini);
-  // map.dragging.disable();
-  // map.touchZoom.disable();
-  // map.doubleClickZoom.disable();
   map.scrollWheelZoom.disable();
-  // map.boxZoom.disable();
-  // map.keyboard.disable();
 
   // Load the base layer
   L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
@@ -303,12 +295,13 @@ function makeDashboard(data) {
     dashArray: '',
     fillOpacity: .5,
   };
+  // highlighed style is cumulative with unhighlighted
   var highlightedStyle = {
     weight: 5,
     opacity: 1,
   };
 
-  // Create info div to show ward on hover
+  // Create info legend to show ward info on hover
   var info = L.control({ position: 'bottomleft' });
   info.onAdd = function (map) {
     this._div = L.DomUtil.create('div', 'info');
@@ -320,7 +313,6 @@ function makeDashboard(data) {
     if (ward_en) { 
       var deaths = 0;
       var normalized_deaths = 0;
-      //_.each(deathsByWard.top(Infinity), function (kv) { if (kv.key == ward_en){deaths=kv.value}})
       deathsByWard.top(Infinity).every( function (kv) { if (kv.key == ward_en){
         deaths = kv.value; 
         yearfilters = yearChart.filters();
@@ -360,6 +352,8 @@ function makeDashboard(data) {
   var locked_ward_en;
 
   // The choropleth overlay on the map 
+  // dc_leaflet has some extensions relative to the main brain.
+  // forEachFeature and featureOptionsHightlighted and an accessor for the geojson layer
   choro = dc_leaflet.choroplethChartX("#map-anchor");
   choro
     .dimension(wardDim)
@@ -468,7 +462,7 @@ function makeDashboard(data) {
     }
   });
 
-  // Highlight map when mouse overward chart
+  // Highlight map when mouse over the ward chart
   wardChart.on('renderlet', function (chart) {
     chart
       .selectAll('g.row')
@@ -536,8 +530,7 @@ function makeDashboard(data) {
       });
   });
 
-  //Toggle reset text for individual chart
-  // TODO: can this be moved outside this function?
+  // Toggle reset text for individual chart
   function toggleReset(chart, id) {
     var filters = chart.filters();
     var t = document.getElementById(id);
@@ -550,7 +543,7 @@ function makeDashboard(data) {
     }
   }
 
-  //Toggle Normalization Buttons
+  // Listen for changes to normalization toggles
   // For ward chart
   var wardSelection = d3.select('#norm-toggle');
   wardSelection.on('change', function(){
@@ -566,36 +559,6 @@ function makeDashboard(data) {
 
   // Render all charts
   dc.renderAll();
-
-  const callback = chart => entries => {
-    redraw_chart_no_transitions(
-        chart
-            .width(null)
-            .height(null)
-            .rescale());
-  };
-
-  //new ResizeObserver(callback(ageChart)).observe(d3.select('#age-chart').node());
-  //new ResizeObserver(callback(yearChart)).observe(d3.select('#year-chart').node());
-  //new ResizeObserver(callback(timeChart)).observe(d3.select('#time-chart').node());
-  //new ResizeObserver(callback(wardChart)).observe(d3.select('#ward-chart').node());
-  // new ResizeObserver(callback(householdChart)).observe(d3.select('#household-chart').node());
-  // new ResizeObserver(callback(genderChart)).observe(d3.select('#gender-chart').node());
-
-  // // Helper function to add x-axis labels
-  // function addXAxis(chartToUpdate, displayText) {
-  //   chartToUpdate.svg()
-  //             .append("text")
-  //             .attr("class", "x-axis-label")
-  //             .attr("text-anchor", "middle")
-  //             .attr("x", chartToUpdate.width()/2)
-  //             .attr("y", chartToUpdate.height()-7)
-  //             .text(displayText);
-  // }
-
-  // // Add x axis labels
-  // addXAxis(wardChart, "Deaths");
-
 
 }
 

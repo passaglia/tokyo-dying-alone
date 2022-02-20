@@ -6,7 +6,7 @@
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-KPK8VTHTN1"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
+    function gtag() { dataLayer.push(arguments); }
     gtag('js', new Date());
 
     gtag('config', 'G-KPK8VTHTN1');
@@ -16,7 +16,7 @@
 
   <!-- CSS -->
   <link rel="stylesheet" href="static/css/custom.css" />
-  <link rel="stylesheet" href="static/css/bootstrap.min.css" />   <!-- Old version because new ver messes up row chart -->
+  <link rel="stylesheet" href="static/css/bootstrap.min.css" /> <!-- Old version because new ver messes up row chart -->
   <link rel="stylesheet" href="static/css/bootstrap-toggle.min.css" />
   <link rel="stylesheet" href="static/css/leaflet.css" />
   <link rel="stylesheet" href="static/css/dc.min.css" />
@@ -29,8 +29,7 @@
   <script src="static/js/dc.min.js"></script>
   <script src="static/js/leaflet-pip.min.js"></script>
   <script src="static/js/underscore-min.js"></script>
-  <script src="static/js/dc.leaflet.js"></script>
-  
+  <script src="static/js/dc.leaflet.custom.js"></script>
   <script src="static/js/jquery.min.js"></script>
   <script src="static/js/bootstrap.min.js"></script>
   <script src="static/js/bootstrap-toggle.min.js"></script>
@@ -47,7 +46,6 @@
     <div class="container-fluid">
       <div class="navbar-header">
         <a class="navbar-brand">
-          <!-- <i class="fa fa-car" aria-hidden="true"></i> -->
           &nbsp;&nbsp;Dying alone in Tokyo, Japan
         </a>
       </div>
@@ -63,20 +61,24 @@
   </div>
 
   <div class="container-fluid">
-
+    
+    <!-- 1st row -->
     <div class="row">
 
+      <!-- 1st column -->
       <div class="col-xs-12 col-md-4">
 
         <!-- Intro panel -->
         <div class='panel' style='padding: 5px; margin-bottom:5px'>
           <p style="font-size: 16px"><b>Welcome!</b></p>
-          <p> Every year, the city of Tokyo gathers information about the thousands of its residents who die at home, often alone and undiscovered for some time.
-          <b> Use this page to explore this data.</b> 
+          <p> Every year, the city of Tokyo gathers information about the thousands of its residents who die at home,
+            often alone and undiscovered for some time.
+            <b> Use this page to explore this data.</b>
           </p>
 
           <p>
-            The charts here are interactive, allowing the data to be filtered in different ways. Click `show help' above each chart for more information.
+            The charts here are interactive, allowing the data to be filtered in different ways. Click `show help' above
+            each chart for more information.
           </p>
 
           <p>
@@ -84,52 +86,54 @@
           </p>
         </div>
 
+        <!-- Subrow in 1st column -->
+        <div class="col-xs-6 col-md-6" style="padding: 0 3px 0">
+          <!-- The Gender chart-->
+          <div class="chart-wrapper">
+            <div class="chart-title">
+              Sex
+              <a onclick="toggle(this, '#gender-help')">[show help]</a>
+              <span id="gender-chart-reset" data-reset-script="javascript:genderChart.filterAll();dc.redrawAll();">
+              </span>
+            </div>
 
-      <div class="col-xs-6 col-md-6" style="padding: 0 3px 0">
-        <!-- The Gender chart-->
-        <div class="chart-wrapper">
-          <div class="chart-title">
-            Sex
-            <a onclick="toggle(this, '#gender-help')">[show help]</a>
-            <span id="gender-chart-reset"
-              data-reset-script="javascript:genderChart.filterAll();dc.redrawAll();">
-            </span>
-          </div>
+            <div class="chart-notes" id="gender-help" style="display: none">
+              The city reports death information separately for men and women. Filter by clicking on a bar, and click
+              the bar again to unfilter.
+            </div>
 
-          <div class="chart-notes" id="gender-help" style="display: none">
-            The city reports death information separately for men and women. Filter by clicking on a bar, and click the bar again to unfilter.
-          </div>
-
-          <div class="chart-stage">
-            <div id="gender-chart" style="width: 100%;"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-xs-6 col-md-6" style="padding: 0 2px 0">
-        <!-- The Household chart-->
-        <div class="chart-wrapper">
-          <div class="chart-title">
-            Household Status
-            <a onclick="toggle(this, '#household-help')">[show help]</a>
-            <span id="household-chart-reset"
-              data-reset-script="javascript:householdChart.filterAll();dc.redrawAll();">
-            </span>
-          </div>
-
-          <div class="chart-notes" id="household-help" style="display: none">
-            Some of the deceased lived alone, while some lived with other people. Filter by clicking on a bar, and click the bar again to unfilter.
-          </div>
-
-          <div class="chart-stage">
-            <div id="household-chart" style="width: 100%;"></div>
+            <div class="chart-stage">
+              <div id="gender-chart" style="width: 100%;"></div>
+            </div>
           </div>
         </div>
-      </div>
+
+        <div class="col-xs-6 col-md-6" style="padding: 0 2px 0">
+          <!-- The Household chart-->
+          <div class="chart-wrapper">
+            <div class="chart-title">
+              Household Status
+              <a onclick="toggle(this, '#household-help')">[show help]</a>
+              <span id="household-chart-reset"
+                data-reset-script="javascript:householdChart.filterAll();dc.redrawAll();">
+              </span>
+            </div>
+
+            <div class="chart-notes" id="household-help" style="display: none">
+              Some of the deceased lived alone, while some lived with other people. Filter by clicking on a bar, and
+              click the bar again to unfilter.
+            </div>
+
+            <div class="chart-stage">
+              <div id="household-chart" style="width: 100%;"></div>
+            </div>
+          </div>
+        </div>
 
 
       </div>
-
+      
+      <!-- 1st row 2nd column -->
       <div class="col-xs-12 col-md-4">
         <!-- The Map -->
         <div class="chart-wrapper">
@@ -138,14 +142,15 @@
             <a onclick="toggle(this, '#map-help')">[show help]</a>
           </div>
           <div class="chart-notes" id="map-help" style="display: none">
-           Hover over Tokyo's 23 wards to filter by death location. Click a ward to lock the filter onto it, and click again anywhere to unlock. Wards are color-coded based on the deaths-by-ward chart.
+            Hover over Tokyo's 23 wards to filter by death location. Click a ward to lock the filter onto it, and click
+            again anywhere to unlock. Wards are color-coded based on the deaths-by-ward chart.
           </div>
           <div class="chart-stage">
 
-              <div id="map" style="width: 100%; height: 385px;">
+            <div id="map" style="width: 100%; height: 385px;">
 
             </div>
-            <div id='map-anchor'></div>
+            <div id='map-anchor'></div> <!-- To anchor the choro chart -->
           </div>
         </div>
 
@@ -155,15 +160,12 @@
         <!-- The Ward chart -->
         <div class="chart-wrapper">
           <div class="chart-title">
-            <input id="norm-toggle" type="checkbox" data-toggle="toggle"
-            data-width=230
-            data-on="As a fraction of all deaths"
-            data-off="Deaths at home by ward"
-            data-style="slow">
+            <input id="norm-toggle" type="checkbox" data-toggle="toggle" data-width=230
+              data-on="As a fraction of all deaths" data-off="Deaths at home by ward" data-style="slow">
             <script>
               // This shoots off an event that is that captured in main.js
-              $(function() {
-                $('#norm-toggle').change(function() {
+              $(function () {
+                $('#norm-toggle').change(function () {
                   d3.select("#norm-toggle").on("change")();
                 })
               })
@@ -172,18 +174,21 @@
           </div>
 
           <div class="chart-notes" id="ward-help" style="display: none">
-            The number of deaths per ward. Click a bar to filter on a ward, and click again to unfilter. Click the title to divide the number of deaths at home by the total number of deaths in each ward, which helps account for the different population of each ward.
+            The number of deaths at home per ward. Click a bar to filter on a ward, and click again to unfilter. Click the title
+            to divide the number of deaths at home by the total number of deaths in each ward, which helps account for
+            the different population of each ward.
           </div>
 
           <div class="chart-stage">
             <div id="ward-chart"></div>
           </div>
-          
+
         </div>
       </div>
 
     </div>
 
+    <!-- 2nd row -->
     <div class="row">
 
       <div class="col-xs-12 col-md-4">
@@ -192,18 +197,20 @@
           <div class="chart-title">
             Time until discovery
             <a onclick="toggle(this, '#time-help')">[show help]</a>
-            <span id="time-chart-reset"
-              data-reset-script="javascript:timeChart.filterAll();dc.redrawAll();">
+            <span id="time-chart-reset" data-reset-script="javascript:timeChart.filterAll();dc.redrawAll();">
             </span>
           </div>
 
           <div class="chart-notes" id="time-help" style="display: none">
-            Click and drag across this chart to filter by the amount of time after death it took to discover each person. Due to data limitations, this chart cannot be filtered simultaneously with the age chart.
+            Click and drag across this chart to filter by the amount of time after death it took to discover each
+            person. Due to data limitations, this chart cannot be filtered simultaneously with the age chart.
           </div>
 
           <div class="chart-stage">
-            <div id="time-chart" ></div>
-            <div id="time-chart-hider" style="display: none"> The data is not detailed enough to permit the crossfiltering of age and time-to-discovery data. To restore this chart, <a href="javascript:ageChart.filterAll();dc.redrawAll();">[reset the age chart]</a>. </div> 
+            <div id="time-chart"></div>
+            <div id="time-chart-hider" style="display: none"> The data is not detailed enough to permit the
+              crossfiltering of age and time-to-discovery data. To restore this chart, <a
+                href="javascript:ageChart.filterAll();dc.redrawAll();">[reset the age chart]</a>. </div>
           </div>
         </div>
       </div>
@@ -214,17 +221,19 @@
           <div class="chart-title">
             Age Bracket
             <a onclick="toggle(this, '#age-help')">[show help]</a>
-            <span id="age-chart-reset"
-              data-reset-script="javascript:ageChart.filterAll();dc.redrawAll();">
+            <span id="age-chart-reset" data-reset-script="javascript:ageChart.filterAll();dc.redrawAll();">
             </span>
           </div>
 
           <div class="chart-notes" id="age-help" style="display: none">
-            Click and drag across this chart to filter by the age of the deceased in 5-year bins. Due to data limitations, this chart cannot be filtered simultaneously with the time-to-discovery chart.          </div>
+            Click and drag across this chart to filter by the age of the deceased in 5-year bins. Due to data
+            limitations, this chart cannot be filtered simultaneously with the time-to-discovery chart. </div>
 
           <div class="chart-stage">
-            <div id="age-chart" ></div>
-            <div id="age-chart-hider" style="display: none">The data is insufficiently detailed to permit crossfiltering of age and time-to-discovery data. To restore this chart, <a href="javascript:timeChart.filterAll();dc.redrawAll();">[reset the time chart]</a>. </div> 
+            <div id="age-chart"></div>
+            <div id="age-chart-hider" style="display: none">The data is insufficiently detailed to permit crossfiltering
+              of age and time-to-discovery data. To restore this chart, <a
+                href="javascript:timeChart.filterAll();dc.redrawAll();">[reset the time chart]</a>. </div>
 
           </div>
         </div>
@@ -234,27 +243,24 @@
         <!-- The year chart-->
         <div class="chart-wrapper">
           <div class="chart-title">
-            <input id="year-norm-toggle" type="checkbox" data-toggle="toggle"
-            data-width=230
-            data-on="As a fraction of all deaths"
-            data-off="Deaths at home by year"
-            data-style="slow">
+            <input id="year-norm-toggle" type="checkbox" data-toggle="toggle" data-width=230
+              data-on="As a fraction of all deaths" data-off="Deaths at home by year" data-style="slow">
             <script>
               // This shoots off an event that is that captured in main.js
-              $(function() {
-                $('#year-norm-toggle').change(function() {
+              $(function () {
+                $('#year-norm-toggle').change(function () {
                   d3.select("#year-norm-toggle").on("change")();
                 })
               })
             </script>
             <a onclick="toggle(this, '#year-help')">[show help]</a>
-            <span id="year-chart-reset"
-              data-reset-script="javascript:yearChart.filterAll();dc.redrawAll();">
+            <span id="year-chart-reset" data-reset-script="javascript:yearChart.filterAll();dc.redrawAll();">
             </span>
           </div>
 
           <div class="chart-notes" id="year-help" style="display: none">
-            Click and drag across this chart to filter by year between 2003 and 2019. Click the title to divide by the total deaths in the selected wards in each year, which helps account for the change in Tokyo's population.
+            Click and drag across this chart to filter by year between 2003 and 2019. Click the title to divide by the
+            total deaths in the selected wards in each year, which helps account for the change in Tokyo's population.
           </div>
 
           <div class="chart-stage">
@@ -269,7 +275,8 @@
     <footer id="footer">
 
       <div class="social icons">
-        <a href="https://github.com/passaglia/tokyo-dying-alone" class="icon circle fa-github"><span class="label">Github</span></a>
+        <a href="https://github.com/passaglia/tokyo-dying-alone" class="icon circle fa-github"><span
+            class="label">Github</span></a>
         <a href="https://twitter.com/andpersam" class="icon circle fa-twitter"><span class="label">Twitter</span></a>
         <a href="https://www.linkedin.com/in/sam-passaglia" class="icon circle fa-linkedin"><span
             class="label">Linkedin</span></a>
@@ -278,8 +285,9 @@
         <div class="menu">
           <p>&copy; Sam Passaglia 2022</p>
           <p>Data from the <a href="https://www.fukushihoken.metro.tokyo.lg.jp/kansatsu/kodokushitoukei/index.html "
-              target="_blank">Tokyo Coroner's Office</a> via the <a href="https://portal.data.metro.tokyo.lg.jp/" target="_blank">Tokyo Open Data
-                Catalog</a>.
+              target="_blank">Tokyo Coroner's Office</a> via the <a href="https://portal.data.metro.tokyo.lg.jp/"
+              target="_blank">Tokyo Open Data
+              Catalog</a>.
           </p>
         </div>
       </div>
@@ -287,7 +295,7 @@
   </div>
   </div>
 
-  <!-- the script for the toggle -->
+  <!-- the script for the help toggle -->
   <script type="text/javascript">
     function toggle(t, id) {
       if (t.innerHTML == "[hide help]") {
