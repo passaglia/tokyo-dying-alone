@@ -40,9 +40,5 @@ The deploy.sh shell script automates deployment as a Github Page.
 
 ## To do
 
--- move my choropleth function to a standalone file / fork the git
-
 -- clean up the code and add comments
-
--- Reorganize all the libraries
 
