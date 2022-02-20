@@ -63,7 +63,7 @@ body.application hr {
  * CSS For the Toggle
  */
 .slow .toggle-group { transition: left 0.7s; -webkit-transition: left 0.7s; }
-.slow .toggle-group .btn { vertical-align: middle; padding: 50px}
+.slow .toggle-group .btn {padding: 10px}
 
 /*
  * Imported from Nick Hand
