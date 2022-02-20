@@ -1,8 +1,10 @@
-# Dying alone in Tokyo, Japan
+# Tokyo-Dying-Alone
 
-A visualization of data around the `Lonely death' problem in Tokyo, available at [passaglia.jp/tokyo-dying-alone](http://passaglia.jp/tokyo-dying-alone).
+**Tokyo-dying-alone** is a visualization of data surrounding the `Lonely death' problem in Tokyo, Japan. It is available at [passaglia.jp/tokyo-dying-alone](http://passaglia.jp/tokyo-dying-alone).
 
-The dashboard is built with [dc.js](https://dc-js.github.io/dc.js/), [crossfilter](https://github.com/crossfilter/crossfilter), and [leaflet](https://leafletjs.com/). The data cleaning uses [pandas](https://pandas.pydata.org/).
+The data covers 17 years of deaths at home in each ward of Tokyo, including information about gender, age, household status, and time-to-discovery of the deceased.
+
+The dashboard is responsive, being built with [dc.js](https://dc-js.github.io/dc.js/), [crossfilter](https://github.com/crossfilter/crossfilter), and [leaflet](https://leafletjs.com/). The data is processed using [pandas](https://pandas.pydata.org/) and is decompressed in browser using [fflate](https://github.com/101arrowz/fflate). 
 
 ## Running the dashboard locally
 
