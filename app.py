@@ -1,10 +1,8 @@
-
 from flask import Flask
 from flask import render_template, send_file
 import os
 
-# current directory
-curr_dir = os.path.dirname(os.path.abspath(__file__))
+curr_dir = os.path.dirname(os.path.abspath(__file__)) # current directory
 
 app = Flask(__name__)
 
@@ -23,7 +21,7 @@ def get_data():
 
     return send_file(filename)
 
-# Route to access ward list
+# Route to access ward data
 @app.route("/data/wards")
 def get_ward_data():
 
@@ -33,7 +31,7 @@ def get_ward_data():
     
     return send_file(filename)
 
-# Route to access total death list
+# Route to access total death data
 @app.route("/data/total")
 def get_total_death_data():
 

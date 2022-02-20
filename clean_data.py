@@ -1,4 +1,3 @@
-#
 # For each ward and year, this script takes in two .csv files describing the number of deaths by age-bracket and deaths-by-time.
 # Outputs a single cumulative compressed csv containing one row per death.
 #
