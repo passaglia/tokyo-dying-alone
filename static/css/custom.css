@@ -63,7 +63,7 @@ body.application hr {
  * CSS For the Toggle
  */
 .slow .toggle-group { transition: left 0.7s; -webkit-transition: left 0.7s; }
-.slow .toggle-group label {padding-bottom: 5px; padding-top:0px;}
+.slow .toggle-group label {padding-bottom: 0px; padding-top:0px;}
 
 /*
  * Imported from Nick Hand
