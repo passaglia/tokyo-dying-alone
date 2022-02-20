@@ -4,13 +4,14 @@
 
 The data covers 17 years of deaths at home in each ward of Tokyo, including information about gender, age, household status, and time-to-discovery of the deceased.
 
-The dashboard is responsive, being built with [dc.js](https://dc-js.github.io/dc.js/), [crossfilter](https://github.com/crossfilter/crossfilter), and [leaflet](https://leafletjs.com/). The data is processed using [pandas](https://pandas.pydata.org/) and is decompressed in browser using [fflate](https://github.com/101arrowz/fflate). 
+The dashboard is responsive, being built with [dc.js](https://dc-js.github.io/dc.js/), [crossfilter](https://github.com/crossfilter/crossfilter), and [leaflet](https://leafletjs.com/). The data is processed using [pandas](https://pandas.pydata.org/) and is decompressed in browser using [fflate](https://github.com/101arrowz/fflate). The static site uses [bootstrap](https://getbootstrap.com/).
+
+[![Demo screenshot](img/dashboard.png)](http://passaglia.jp/tokyo-dying-alone)
+
 
 ## Running the dashboard locally
 
-The dashboard can be run locally using the [Flask](https://flask.palletsprojects.com/en/2.0.x/) python framework.
-
-To do so, in the root directory run
+The dashboard can be run locally using the [Flask](https://flask.palletsprojects.com/en/2.0.x/) python framework. To do so, in the root directory run
 
 ```
 export FLASK_APP=app.py
