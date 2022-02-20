@@ -37,8 +37,3 @@ npx browser-sync start --server
 ```
 
 The deploy.sh shell script automates deployment as a Github Page.
-
-## To do
-
--- clean up the code and add comments
-
