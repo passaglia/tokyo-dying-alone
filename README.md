@@ -2,12 +2,11 @@
 
 **Tokyo-dying-alone** is a visualization of data surrounding the `Lonely death' problem in Tokyo, Japan. It is available at [passaglia.jp/tokyo-dying-alone](http://passaglia.jp/tokyo-dying-alone).
 
-The data covers 17 years of deaths at home in each ward of Tokyo, including information about gender, age, household status, and time-to-discovery of the deceased.
+The data covers 17 years of deaths at home in each ward of Tokyo, including information about gender, age, household status, and days-to-discovery of the deceased.
 
-The dashboard is responsive, being built with [dc.js](https://dc-js.github.io/dc.js/), [crossfilter](https://github.com/crossfilter/crossfilter), and [leaflet](https://leafletjs.com/). The data is processed with [pandas](https://pandas.pydata.org/) and is decompressed in browser using [fflate](https://github.com/101arrowz/fflate). The static site uses [bootstrap](https://getbootstrap.com/).
+The dashboard is responsive. It is built with [dc.js](https://dc-js.github.io/dc.js/), [crossfilter](https://github.com/crossfilter/crossfilter), and [leaflet](https://leafletjs.com/). The data is processed with [pandas](https://pandas.pydata.org/) and is decompressed in browser using [fflate](https://github.com/101arrowz/fflate). The static site uses [bootstrap](https://getbootstrap.com/).
 
 [![Demo screenshot](img/dashboard.png)](http://passaglia.jp/tokyo-dying-alone)
-
 
 ## Running the dashboard locally
 
@@ -37,3 +36,4 @@ npx browser-sync start --server
 ```
 
 The deploy.sh shell script automates deployment as a Github Page.
+
