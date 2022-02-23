@@ -72,18 +72,38 @@
         <div class='panel' style='padding: 5px; margin-bottom:5px'>
           <p style="font-size: 16px"><b>Welcome!</b></p>
           <p> Every year, the city of Tokyo gathers information about the thousands of its residents who die at home,
-            often alone and undiscovered for some time.
-            <b> Use this page to explore this data.</b>
+            often alone and undiscovered for some time. </p>
+            <p>
+            <b> Use the interactive charts on this page to explore this data. </b> Click the help button above
+              each chart for more information, and see the accompanying blog post for a detailed explanation.
           </p>
+        </div>
 
-          <p>
-            The charts here are interactive, allowing the data to be filtered in different ways. Click `show help' above
-            each chart for more information.
-          </p>
+        <!--First subrow -->
+        <div class="col-xs-6 col-md-6">
 
-          <p>
-            For a detailed explanation of how this page was made, see the upcoming blog post.
-          </p>
+          <!-- Number of deaths -->
+          <div class="chart-wrapper">
+            <!-- <div class="chart-title">
+              Number of deaths in current slice
+            </div> -->
+            <div class="chart-stage">
+              <div id="deaths-display"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-xs-6 col-md-6">
+
+          <!-- Total Revenue -->
+          <div class="chart-wrapper">
+            <!-- <div class="chart-title">
+              as a fraction of all deaths
+            </div> -->
+            <div class="chart-stage">
+              <div id="fraction-display"></div>
+            </div>
+          </div>
         </div>
 
         <!-- Subrow in 1st column -->
