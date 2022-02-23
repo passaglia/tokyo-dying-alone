@@ -67,6 +67,7 @@ function makeDashboard(data) {
             none:"No deaths at home"})
       .valueAccessor(x => x);
 
+  // The text for the fraction display needs to change depending on whether a ward has been selected
   noWardSelectedFractionHtml = {
     one:"%number of all deaths in city",
     some:"%number of all deaths in city",
@@ -123,7 +124,7 @@ function makeDashboard(data) {
     .x(d3.scaleBand())
     .elasticY(true)
     .width(null)
-    .height(165)
+    .height(177)
     .margins({ top: 25, right: 30, bottom: 30, left: 65 })
     .on('filtered', function (chart) {
       toggleReset(chart, 'gender-chart-reset'); // turn on the reset button when the chart is filtered
@@ -141,7 +142,7 @@ function makeDashboard(data) {
     .x(d3.scaleBand())
     .elasticY(true)
     .width(null)
-    .height(165)
+    .height(177)
     .margins({ top: 25, right: 30, bottom: 30, left: 65 })
     .on('filtered', function (chart) {
       toggleReset(chart, 'household-chart-reset'); // turn on the reset button 
