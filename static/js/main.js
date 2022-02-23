@@ -40,7 +40,8 @@ function makeDashboard(data) {
   var deathsByHousehold = householdDim.group().reduceCount();
   var deathsByWard = wardDim.group().reduceCount();
   var deathsByYear = yearDim.group().reduceCount();
-  
+  var allDeaths = ndx.groupAll();
+
   // For deaths by time group we use a hack to allow ordinal plots to be brushed by mapping to integers
   var deathsByTime = timeDim.group().reduceCount();
   keysToIntegers = {}
@@ -54,6 +55,63 @@ function makeDashboard(data) {
   /////
   // Now we build each chart
   /////
+
+  // Number of deaths display
+  deathsDisplay = dc.numberDisplay("#deaths-display");
+  deathsDisplay
+      .formatNumber(d3.format(",d"))
+      .group(allDeaths)
+      .transitionDuration(0)
+      .html({ one:"%number death at home",
+            some:"%number deaths at home",
+            none:"No deaths at home"})
+      .valueAccessor(x => x);
+
+  noWardSelectedFractionHtml = {
+    one:"%number of all deaths in city",
+    some:"%number of all deaths in city",
+    none:"0% of all deaths in city"
+  }
+  WardSelectedFractionHtml = {
+    one:"%number of all deaths in ward",
+    some:"%number of all deaths in ward",
+    none:"0% of all deaths in ward"
+  }
+  // As a fraction display
+  fractionDisplay = dc.numberDisplay("#fraction-display");
+  fractionDisplay
+    .formatNumber(d3.format(".2%"))
+    .html(noWardSelectedFractionHtml)
+    .group(allDeaths)
+    .transitionDuration(0)
+    .valueAccessor(  function (d) {      
+      yearfilters = yearChart.filters();
+      if (yearfilters.length){
+        yearmin = Math.ceil(yearfilters[0][0]);
+        yearmax = Math.floor(yearfilters[0][1]);
+      }
+      else{
+        yearmin = 2003;
+        yearmax = 2019;
+      }
+      years = d3.range(yearmin, yearmax+1,1);
+      total_deaths_in_time_range = 0;
+
+      wardfilters = choro.filters();
+      if (wardfilters.length){
+        filteredWard = wardfilters[0];
+        for (year of years){
+          total_deaths_in_time_range += total[year][nameToShort[filteredWard]];
+        }
+      }
+      else{
+        for (year of years){
+          total_deaths_in_time_range+=Object.values(total[year]).reduce((partialSum, a) => partialSum + a, 0)
+        }
+      } 
+      return d/total_deaths_in_time_range;
+    }
+    );
 
   // Deaths by Gender Chart
   genderChart = dc.barChart("#gender-chart");
@@ -236,9 +294,7 @@ function makeDashboard(data) {
     .valueAccessor(function (kv) {
       // divide by total deaths in ward if normalize is toggled
       if (yearNormalize) {
-        wardfilters = wardChart.filters();
         wardfilters = choro.filters();
-        console.log(wardfilters.length)
         if (wardfilters.length){
           filteredWard = wardfilters[0];
           return kv.value/total[kv.key][nameToShort[filteredWard]];
@@ -264,7 +320,7 @@ function makeDashboard(data) {
 
   // List of charts to update when the map is hovered over
   // because redrawing the map itself is a little slow
-  nonmap_chartlist = [wardChart, householdChart, ageChart, timeChart, genderChart, yearChart]
+  nonmap_chartlist = [deathsDisplay, fractionDisplay, wardChart, householdChart, ageChart, timeChart, genderChart, yearChart]
 
   // Initialize the map
   const mapLat_ini = 35.67; // Tokyo
@@ -368,6 +424,7 @@ function makeDashboard(data) {
         if (!(ward_lock)) {
           this.setStyle(highlightedStyle);
           info.update(this.feature.properties.ward_en);
+          fractionDisplay.html(WardSelectedFractionHtml);
           wardChart.replaceFilter([[this.feature.properties.ward_en]]);
           choro.replaceFilter([[this.feature.properties.ward_en]]);
           _.each(nonmap_chartlist, function (chart) { chart.redraw(); });
@@ -379,6 +436,7 @@ function makeDashboard(data) {
           info.update();
           wardChart.replaceFilter([[]]);
           choro.replaceFilter([[]]);
+          fractionDisplay.html(noWardSelectedFractionHtml);
           _.each(nonmap_chartlist, function (chart) { chart.redraw(); });
         }
       });
@@ -388,6 +446,7 @@ function makeDashboard(data) {
           ward_lock = false;
           locked_ward_en = null;
           info.update(this.feature.properties.ward_en);
+          fractionDisplay.html(WardSelectedFractionHtml);
           wardChart.replaceFilter([[]]);
           choro.replaceFilter([[]]);
           choro.geojsonLayer().eachLayer(function (layer) { layer.setStyle(unhighlightedStyle); })
@@ -396,6 +455,7 @@ function makeDashboard(data) {
           ward_lock = true;
           locked_ward_en = this.feature.properties.ward_en;
           info.update(this.feature.properties.ward_en);
+          fractionDisplay.html(WardSelectedFractionHtml);
           wardChart.replaceFilter([[this.feature.properties.ward_en]]);
           choro.replaceFilter([[this.feature.properties.ward_en]]);
           choro.geojsonLayer().eachLayer(function (layer) {
@@ -437,6 +497,7 @@ function makeDashboard(data) {
       choro.calculateColorDomain();
       if (ward_lock){
         info.update(locked_ward_en);
+        fractionDisplay.html(WardSelectedFractionHtml);
       }
     })
     .featureKeyAccessor(function (feature) {
@@ -457,6 +518,7 @@ function makeDashboard(data) {
       wardChart.replaceFilter([[]]);
       choro.replaceFilter([[]]);
       info.update()
+      fractionDisplay.html(noWardSelectedFractionHtml);
       choro.geojsonLayer().eachLayer(function (layer) { layer.setStyle(unhighlightedStyle); });
       _.each(nonmap_chartlist, function (chart) { chart.redraw(); });
     }
@@ -479,6 +541,7 @@ function makeDashboard(data) {
           choro.replaceFilter([[layer.feature.properties.ward_en]]);
           layer.setStyle(highlightedStyle);
           info.update(layer.feature.properties.ward_en);
+          fractionDisplay.html(WardSelectedFractionHtml);
           _.each(nonmap_chartlist, function (chart) { chart.redraw(); });
         }
       })
@@ -494,6 +557,7 @@ function makeDashboard(data) {
           choro.replaceFilter([[]]);
           layer.setStyle(unhighlightedStyle);
           info.update();
+          fractionDisplay.html(noWardSelectedFractionHtml);
           _.each(nonmap_chartlist, function (chart) { chart.redraw(); });
         }
       })
@@ -517,6 +581,7 @@ function makeDashboard(data) {
 
           locked_ward_en = key;
           info.update(layer.feature.properties.ward_en);
+          fractionDisplay.html(WardSelectedFractionHtml);
           wardChart.replaceFilter([[key]]);
           choro.replaceFilter([[key]]);
           choro.geojsonLayer().eachLayer(function (layer) {

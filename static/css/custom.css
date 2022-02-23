@@ -69,13 +69,13 @@ body.application hr {
  * Imported from Nick Hand
  */
 
-#number-records-nd {
-    font-size: 3vw;
+/* #deaths-display {
+    font-size: 1vw;
 }
 
-#number-revenue-nd {
-    font-size: 3vw;
-}
+#fraction-display {
+    font-size: 1vw;
+} */
 
 @media (max-width: 991px) {
   .hot-spot-table{
