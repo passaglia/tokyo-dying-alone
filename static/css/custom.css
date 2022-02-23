@@ -69,24 +69,12 @@ body.application hr {
  * Imported from Nick Hand
  */
 
-/* #deaths-display {
-    font-size: 1vw;
+#deaths-display {
+    font-size: 1.1em;
 }
 
 #fraction-display {
-    font-size: 1vw;
-} */
-
-@media (max-width: 991px) {
-  .hot-spot-table{
-    font-size: 1.8vw;
-  }
-}
-
-@media (min-width: 992px) {
-  .hot-spot-table{
-    font-size: 1vw;
-  }
+    font-size: 1.1em;
 }
 
 .nav.navbar-nav.navbar-right li a:hover {
