@@ -125,7 +125,7 @@ function makeDashboard(data) {
     .elasticY(true)
     .width(null)
     .height(177)
-    .margins({ top: 15, right: 30, bottom: 30, left: 65 })
+    .margins({ top: 10, right: 30, bottom: 30, left: 65 })
     .on('filtered', function (chart) {
       toggleReset(chart, 'gender-chart-reset'); // turn on the reset button when the chart is filtered
     })
@@ -143,7 +143,7 @@ function makeDashboard(data) {
     .elasticY(true)
     .width(null)
     .height(177)
-    .margins({ top: 15, right: 30, bottom: 30, left: 65 })
+    .margins({ top: 10, right: 30, bottom: 30, left: 65 })
     .on('filtered', function (chart) {
       toggleReset(chart, 'household-chart-reset'); // turn on the reset button 
     })
