@@ -1,14 +1,12 @@
 <a href="https://passaglia.jp/tokyo-dying-alone"> <img src="/img/tokyo-dying-alone-header.png" alt="Demo screenshot" height="200"/> </a>
 
-**Tokyo Dying Alone** is a visualization of data surrounding the `lonely death' problem in Tokyo, Japan. It is available at [passaglia.jp/tokyo-dying-alone](http://passaglia.jp/tokyo-dying-alone). 
+**Tokyo Dying Alone** is a visualization of data surrounding the 'lonely death' problem in Tokyo, Japan. It is available at [passaglia.jp/tokyo-dying-alone](http://passaglia.jp/tokyo-dying-alone). 
 
 This readme provides a technical overview of the project. See the accompanying [blog post](http://passaglia.jp/tokyo-dying-alone-guide) for a non-technical discussion and analysis.
 
 The data covers 17 years of deaths at home in each ward of Tokyo, including information about gender, age, household status, and days-to-discovery of the deceased.
 
 The dashboard is responsive. It is built with [dc.js](https://dc-js.github.io/dc.js/), [crossfilter](https://github.com/crossfilter/crossfilter), and [leaflet](https://leafletjs.com/). The data is processed with [pandas](https://pandas.pydata.org/) and is decompressed in browser using [fflate](https://github.com/101arrowz/fflate). The static site uses [bootstrap](https://getbootstrap.com/).
-
-[![Demo screenshot](img/dashboard.png)](http://passaglia.jp/tokyo-dying-alone)
 
 ## Running the dashboard locally
 
