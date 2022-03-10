@@ -70,9 +70,13 @@ body.application hr {
  */
 
 @media (max-width: 991px) {
-  .hot-spot-table{
-    font-size: 1.8vw;
-  }
+  #gender-chart {height:500px;}
+  #household-chart {height:500px;}
+  #map{height:500px;;}
+  #ward-chart{height:500px;}
+  #time-chart{height:500px;}
+  #age-chart{height:500px;}
+  #year-chart{height:500px;}
 }
 
 @media (min-width: 992px) {
