@@ -15,7 +15,6 @@ body.application div[class^="col-"] {
   padding-left: 2px;
   padding-right: 2px;
 }
-
 body.application hr {
   border-color: #d7d7d7;
   margin: 10px 0;
@@ -70,15 +69,19 @@ body.application hr {
  */
 
 @media (max-width: 991px) {
+  .navbar-brand {font-size:1.3em;}
+  .navbar-inverse {font-size:1.3em;}
+  .chart-wrapper .chart-notes {font-size:1.4em;}
+  .chart-wrapper .chart-title {font-size:1.5em;}
   #deaths-display {font-size: 1.6em;}
   #fraction-display {font-size: 1.6em;}
-  #gender-chart {height:500px;}
-  #household-chart {height:500px;}
-  #map{height:500px;}
-  #ward-chart{height:500px;}
-  #time-chart{height:500px;}
-  #age-chart{height:500px;}
-  #year-chart{height:500px;}
+  #gender-chart {height:500px; font-size:1.4em;}
+  #household-chart {height:500px;font-size:1.4em;}
+  #map{height:500px;font-size:1.4em;}
+  #ward-chart{height:500px;font-size:1.4em;}
+  #time-chart{height:500px;font-size:1.4em;}
+  #age-chart{height:500px;font-size:1.4em;}
+  #year-chart{height:500px;font-size:1.4em;}
 }
 
 @media (min-width: 992px) {
@@ -91,6 +94,7 @@ body.application hr {
   #time-chart{height:215px;}
   #age-chart{height:215px;}
   #year-chart{height:180px;}
+
 } 
 
 /*
