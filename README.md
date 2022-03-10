@@ -75,7 +75,7 @@ Finally, the most complicated chart is the map. The map is loaded using the [lea
 
 As the user moves the cursor over the map, the hovered-over ward becomes outlined, all the charts are updated to show only the information from that ward, and the ward is highlighted in the neighboring ward chart. A legend also updates to shows the summary data for that ward. Clicking on a ward locks all the charts to that ward, so that further moving of the mouse does not change the selected ward. Clicking again undoes the lock. These interactions are achieved with mouseover events on each element of the geojson layer of the map, which the custom [dc-leaflet] modification exposes.
 
-Likewise interacting with the ward chart updates the map. The title of the ward chart another toggle, which switches the chart and the map from showing the number of deaths at home to showing the number of deaths at home as a fraction of all deaths.
+Likewise interacting with the ward chart updates the map. The title of the ward chart is another toggle, which switches the chart and the map from showing the number of deaths at home to showing the number of deaths at home as a fraction of all deaths.
 
 ## Acknowledgements
 
