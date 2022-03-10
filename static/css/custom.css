@@ -72,7 +72,7 @@ body.application hr {
 @media (max-width: 991px) {
   #gender-chart {height:500px;}
   #household-chart {height:500px;}
-  #map{height:500px;;}
+  #map{height:500px;}
   #ward-chart{height:500px;}
   #time-chart{height:500px;}
   #age-chart{height:500px;}
