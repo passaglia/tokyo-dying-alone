@@ -124,8 +124,8 @@ function makeDashboard(data) {
     .x(d3.scaleBand())
     .elasticY(true)
     .width(null)
-    .height(177)
-    .margins({ top: 10, right: 30, bottom: 30, left: 65 })
+    .height(null)
+    .margins({ top: 10, right: 30, bottom: 45, left: 65 })
     .on('filtered', function (chart) {
       toggleReset(chart, 'gender-chart-reset'); // turn on the reset button when the chart is filtered
     })
@@ -142,8 +142,8 @@ function makeDashboard(data) {
     .x(d3.scaleBand())
     .elasticY(true)
     .width(null)
-    .height(177)
-    .margins({ top: 10, right: 30, bottom: 30, left: 65 })
+    .height(null)
+    .margins({ top: 10, right: 30, bottom: 45, left: 65 })
     .on('filtered', function (chart) {
       toggleReset(chart, 'household-chart-reset'); // turn on the reset button 
     })
@@ -162,7 +162,7 @@ function makeDashboard(data) {
     .centerBar(true)
     .elasticY(true)
     .width(null)
-    .height(194)
+    .height(null)
     .margins({ top: 10, right: 10, bottom: 50, left: 65 })
     .on('filtered', function (chart) {
       toggleReset(chart, 'time-chart-reset');
@@ -194,7 +194,7 @@ function makeDashboard(data) {
     .x(d3.scaleLinear().domain([9, 89]))
     .elasticY(true)
     .width(null)
-    .height(194)
+    .height(null)
     .brushOn(true)
     .margins({ top: 10, right: 10, bottom: 50, left: 45 })
     .on('filtered', function (chart) {
@@ -230,12 +230,12 @@ function makeDashboard(data) {
     .dimension(wardDim)
     .group(deathsByWard)
     .width(null)
-    .height(370)
+    .height(null)
     .elasticX(true)
     .gap(0)
     .margins({ top: 5, right: 10, bottom: 20, left: 12 })
     .valueAccessor(function (kv) {
-      // divid by total deaths in time range if the normalize toggle is on
+      // divide by total deaths in time range if the normalize toggle is on
       if (wardNormalize) {
         yearfilters = yearChart.filters();
         if (yearfilters.length){
@@ -289,9 +289,10 @@ function makeDashboard(data) {
     .group(deathsByYear)
     .x(d3.scaleLinear().domain([2003, 2020]))
     .elasticY(true)
-    .width(null)
-    .height(180)
     .brushOn(true)
+    .width(null)
+    .height(null)
+    .margins({ top: 10, right: 15, bottom: 50, left: 45 })
     .valueAccessor(function (kv) {
       // divide by total deaths in ward if normalize is toggled
       if (yearNormalize) {
@@ -308,7 +309,6 @@ function makeDashboard(data) {
         return kv.value;
       }
     })
-    .margins({ top: 10, right: 15, bottom: 50, left: 45 })
     .on('filtered', function (chart) {
       toggleReset(chart, 'year-chart-reset');
       if (wardNormalize){

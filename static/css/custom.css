@@ -60,10 +60,30 @@ body.application hr {
 }
 
 /*
- * CSS For the Toggle
+ *  For the Toggles
  */
 .slow .toggle-group { transition: left 0.7s; -webkit-transition: left 0.7s; }
 .slow .toggle-group label {padding-bottom: 0px; padding-top:0px;}
+
+/*
+ * Plot heights
+ */
+
+@media (max-width: 991px) {
+  .hot-spot-table{
+    font-size: 1.8vw;
+  }
+}
+
+@media (min-width: 992px) {
+  #gender-chart {height:177px;}
+  #household-chart {height:177px;}
+  #map{height:385px;}
+  #ward-chart{height:370px;}
+  #time-chart{height:215px;}
+  #age-chart{height:215px;}
+  #year-chart{height:180px;}
+} 
 
 /*
  * Imported from Nick Hand
@@ -169,7 +189,6 @@ display: none;
     position: inherited;
     float: left;
     top: 1%;
-    height: 71%;
     width: 100%;
     z-index: 1;
 }
