@@ -60,22 +60,42 @@ body.application hr {
 }
 
 /*
- * CSS For the Toggle
+ *  For the Toggles
  */
 .slow .toggle-group { transition: left 0.7s; -webkit-transition: left 0.7s; }
 .slow .toggle-group label {padding-bottom: 0px; padding-top:0px;}
 
 /*
- * Imported from Nick Hand
+ * Plot heights
  */
 
-#deaths-display {
-    font-size: 1.1em;
+@media (max-width: 991px) {
+  #deaths-display {font-size: 1.6em;}
+  #fraction-display {font-size: 1.6em;}
+  #gender-chart {height:500px;}
+  #household-chart {height:500px;}
+  #map{height:500px;}
+  #ward-chart{height:500px;}
+  #time-chart{height:500px;}
+  #age-chart{height:500px;}
+  #year-chart{height:500px;}
 }
 
-#fraction-display {
-    font-size: 1.1em;
-}
+@media (min-width: 992px) {
+  #deaths-display {font-size: 1.1em;}
+  #fraction-display {font-size: 1.1em;}
+  #gender-chart {height:177px;}
+  #household-chart {height:177px;}
+  #map{height:385px;}
+  #ward-chart{height:370px;}
+  #time-chart{height:215px;}
+  #age-chart{height:215px;}
+  #year-chart{height:180px;}
+} 
+
+/*
+ * Imported from Nick Hand
+ */
 
 .nav.navbar-nav.navbar-right li a:hover {
     color: #C0C0C0;
@@ -169,7 +189,6 @@ display: none;
     position: inherited;
     float: left;
     top: 1%;
-    height: 71%;
     width: 100%;
     z-index: 1;
 }
