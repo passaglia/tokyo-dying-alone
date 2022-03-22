@@ -20,7 +20,7 @@ This reorganizing makes handling the data much more straightforward. It is compr
 
 The relative populations of different wards and their change over time can be accounted for if one knows the total number of deaths -- including those not at home -- in each year for each ward. This is provided by [a Tokyo Open Data Catalog dataset](https://catalog.data.metro.tokyo.lg.jp/dataset/t000010d0000000009/resource/99d5cb41-a30d-4d3e-85cc-cf316a2a7b26) from the Tokyo Bureau of Social Welfare and Public Health, saved here in `/data/rawdata/shibou.csv`. `clean_data.py` also does some processing of that file and outputs it as `/data/total/shibou.json`.
 
-## Setting up of the website
+## Setting up the website
 
 The dashboard is developed as a [Flask](https://flask.palletsprojects.com/en/2.0.x/) app. The app.py file defines a route to the index page stored in `/templates/index.html` that the user is served, as well as routes to the three data files which the main charting script`/static/js/main.js` accesses: `/data/alone` leads to the full deaths at home data, `/data/total` leads to the statistics about total deaths including those not at home, and `/data/wards` leads to the geographic information about the wards.
 
