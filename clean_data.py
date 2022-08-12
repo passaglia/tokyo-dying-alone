@@ -157,9 +157,12 @@ def clean_total_deaths(df):
     for i in range(14,31):
         year = 2002 + i - 14
         df.columns = df.columns.str.replace("平成"+str(i)+"年", str(year))
-    df["2019"] = pd.to_numeric(df["令和元年"].str.replace(',',''))
+    # df["2019"] = pd.to_numeric(df["令和元年"].str.replace(',',''))
+    df["2019"] = pd.to_numeric(df["令和元年"])
+    df["2020"] = pd.to_numeric(df["令和2年"])
+
     df=df.rename(columns={'区市町村':'ward_jp'})
-    cols_to_keep = ['ward_jp']+[str(i) for i in range(2002, 2020)]
+    cols_to_keep = ['ward_jp']+[str(i) for i in range(2002, 2021)]
     df = df[cols_to_keep]
 
     # keep only the relevant wards
@@ -257,9 +260,10 @@ if __name__ == '__main__':
 
     # information about each ward and year and the preclean functions to use on them
     wards = [str(i+1).zfill(2) for i in range(23)]
-    years = ['H'+str(i) for i in range(15,31)] + ['R1']
+    years = ['H'+str(i) for i in range(15,31)] + ['R1','R2']
     yearsToWestern = dict([('H'+str(i), i + 1988) for i in range(15,31)] )
     yearsToWestern['R1'] =2019
+    yearsToWestern['R2'] = 2020
     precleanagefunctions = dict([(year, preclean_age) for year in years])
     precleanagefunctions.update({'H20': H22_preclean_age, 'H21': H22_preclean_age, 'H22': H22_preclean_age,'H28':H28_preclean_age})
     precleantimefunctions = dict([(year, preclean_time) for year in years])
