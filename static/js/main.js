@@ -10,6 +10,8 @@ function makeDashboard(data) {
   aloneArrayBuffer = data[1];
   total = data[2];
 
+  max_year = 2020;
+
   // The largest data file is loaded in compressed. Decompress it here
   compressed_file = new Uint8Array(aloneArrayBuffer);
   decompressed_file = fflate.strFromU8(fflate.decompressSync(compressed_file));
@@ -93,7 +95,7 @@ function makeDashboard(data) {
       }
       else{
         yearmin = 2003;
-        yearmax = 2019;
+        yearmax = max_year;
       }
       years = d3.range(yearmin, yearmax+1,1);
       total_deaths_in_time_range = 0;
@@ -244,7 +246,7 @@ function makeDashboard(data) {
         }
         else{
           yearmin = 2003;
-          yearmax = 2019;
+          yearmax = max_year;
         }
         years = d3.range(yearmin, yearmax+1,1);
         total_deaths_in_time_range = 0;
@@ -266,7 +268,7 @@ function makeDashboard(data) {
         }
         else{
           yearmin = 2003;
-          yearmax = 2019;
+          yearmax = max_year;
         }
         years = d3.range(yearmin, yearmax+1,1);
         total_deaths_in_time_range = 0;
@@ -287,7 +289,7 @@ function makeDashboard(data) {
     .xAxisLabel("Year")
     .dimension(yearDim)
     .group(deathsByYear)
-    .x(d3.scaleLinear().domain([2003, 2020]))
+    .x(d3.scaleLinear().domain([2003, max_year+1]))
     .elasticY(true)
     .brushOn(true)
     .width(null)
@@ -379,7 +381,7 @@ function makeDashboard(data) {
         }
         else{
           yearmin = 2003;
-          yearmax = 2019;
+          yearmax = max_year;
         }
         years = d3.range(yearmin, yearmax+1,1);
         total_deaths_in_time_range = 0;
@@ -409,8 +411,8 @@ function makeDashboard(data) {
   var locked_ward_en;
 
   // The choropleth overlay on the map 
-  // dc_leaflet has some extensions relative to the main brain.
-  // forEachFeature and featureOptionsHightlighted and an accessor for the geojson layer
+  // dc_leaflet has some extensions relative to the main branch.
+  // forEachFeature and featureOptionsHighlighted and an accessor for the geojson layer
   choro = dc_leaflet.choroplethChartX("#map-anchor");
   choro
     .dimension(wardDim)
@@ -478,7 +480,7 @@ function makeDashboard(data) {
         }
         else{
           yearmin = 2003;
-          yearmax = 2019;
+          yearmax = max_year;
         }
         years = d3.range(yearmin, yearmax+1,1);
         total_deaths_in_time_range = 0;
